@@ -26,6 +26,10 @@ function BorrowPage() {
   const [balanceDeposit, setBalanceDeposit] = useState(0);
   const [borrowInfo, setBorrowInfo] = useState();
 
+  const [healthRatio, setHealthRatio] = useState(0);
+  const [avaiBorrow, setAvaiBorrow] = useState([0, 0]);
+  const [avaiBorrowTotal, setAvaiBorrowTotal] = useState([0, 0]);
+
   const [updateUI, setUpdateUI] = useState(false);
 
   const { principal, borrowActor } = useAuth();
@@ -47,6 +51,9 @@ function BorrowPage() {
           borrowActor.getDepositIdPerUser(principal);
           setBalanceDeposit(Number(tx4[0].amount));
           setBorrowInfo(tx4[0]);
+          const tx5 = await
+          borrowActor.getHealthRaito(principal);
+          setHealthRatio(Math.abs(100 - (Number(tx5) * 100)));
         } catch (error) {
           console.log(error);
         }
@@ -54,6 +61,20 @@ function BorrowPage() {
     };
     balanceToken();
   }, [principal, updateUI]);
+
+  useEffect(() => {
+    if (balanceLpToken) {
+      const func = async () => {
+        const tx = await
+        borrowActor.getAvaiableToBorrow(balanceDeposit);
+        setAvaiBorrow([Number(tx[0]), Number(tx[1])]);
+        const tx1 = await
+        borrowActor.getAvaiableToBorrow(balanceLpToken + balanceDeposit);
+        setAvaiBorrowTotal([Number(tx1[0]), Number(tx1[1])]);
+      };
+      func();
+    }
+  }, [balanceDeposit, balanceLpToken, principal, updateUI]);
 
   const openRepayModal = () => {
     setIsRepayModalOpen(true);
@@ -134,6 +155,9 @@ function BorrowPage() {
             borrowInfo={borrowInfo}
             balanceLpToken={balanceLpToken}
             balanceDeposit={balanceDeposit}
+            healthRatio={healthRatio}
+            avaiBorrow={avaiBorrow}
+            avaiBorrowTotal={avaiBorrowTotal}
           />
           {/* <Borrow />
           <Borrow />

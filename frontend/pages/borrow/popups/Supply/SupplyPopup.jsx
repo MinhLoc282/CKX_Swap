@@ -169,7 +169,7 @@ SupplyPopup.propTypes = {
   closeSupplyModal: PropTypes.func.isRequired,
   setUpdateUI: PropTypes.func.isRequired,
   decimals: PropTypes.number,
-  tokenBalance: PropTypes.number,
+  tokenBalance: PropTypes.array,
 };
 
 SupplyPopup.defaultProps = {

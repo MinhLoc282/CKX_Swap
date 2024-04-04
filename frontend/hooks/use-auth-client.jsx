@@ -34,7 +34,7 @@ const defaultOptions = {
     identityProvider:
       process.env.DFX_NETWORK === 'ic'
         ? 'https://identity.ic0.app/#authorize'
-        : 'http://br5f7-7uaaa-aaaaa-qaaca-cai.localhost:4943#authorize',
+        : `http://${process.env.CANISTER_ID_INTERNET_IDENTITY}.localhost:4943#authorize`,
   },
 };
 

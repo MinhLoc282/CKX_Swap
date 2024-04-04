@@ -278,7 +278,8 @@ function SwapPage() {
                 <p>
                   Balance:
                   {' '}
-                  {userBalanceToken0[0] ? Number(userBalanceToken0[0]) : 0}
+                  {userBalanceToken0[0]
+                    ? Math.round((Number(userBalanceToken0[0]) / 10 ** 18) * 1000) / 1000 : 0}
                 </p>
                 <div className={styles.quickInputButton}>
                   <button onClick={() => changeAmountIn(20)} style={{ backgroundColor: quickInputAmountIn === 20 ? 'rgba(126, 135, 255, 1)' : 'rgba(24, 25, 33, 1)' }} type="button">20%</button>
@@ -318,12 +319,13 @@ function SwapPage() {
                 <p>
                   Balance:
                   {' '}
-                  {userBalanceToken1[0] ? Number(userBalanceToken1[0]) : 0}
+                  {userBalanceToken1[0]
+                    ? Math.round((Number(userBalanceToken1[0]) / 10 ** 18) * 1000) / 1000 : 0}
                 </p>
               </div>
               {(principal && selectedToken0Name && selectedToken1Name
               && validation.values.amountIn && validation.values.amountOutMin
-              && Number(userBalanceToken0[0])) ? (
+              ) ? (
                 <button className={styles.SwapButton} type="submit">Swap</button>)
                 : <button className={styles.SwapButtonDisable} disabled type="button">Enter an amount</button>}
             </form>

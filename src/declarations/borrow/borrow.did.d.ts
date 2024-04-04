@@ -8,20 +8,22 @@ export interface Borrow {
   'checkRemoveLP' : ActorMethod<[Array<Principal>], Array<bigint>>,
   'checkRemoveLP_2' : ActorMethod<[Principal], Array<number>>,
   'deposit' : ActorMethod<[bigint], string>,
+  'getAvaiableToBorrow' : ActorMethod<[bigint], Array<bigint>>,
   'getDepositId' : ActorMethod<[], [] | [DepositType]>,
   'getDepositIdPerUser' : ActorMethod<[Principal], [] | [DepositType]>,
+  'getHealthRaito' : ActorMethod<[Principal], number>,
   'getLoanDetail' : ActorMethod<[bigint], [] | [LoanDetail]>,
   'getPairInfo' : ActorMethod<[bigint], Array<bigint>>,
   'getPairInfoPrincipal' : ActorMethod<[bigint], Array<string>>,
   'getReserves' : ActorMethod<[], Array<bigint>>,
   'getTokenBalance' : ActorMethod<[Principal, Principal], Balance>,
   'getTokenDecimals' : ActorMethod<[Principal], number>,
-  'getTotalLoan' : ActorMethod<[], bigint>,
+  'getloanId' : ActorMethod<[], bigint>,
   'rePay' : ActorMethod<[], string>,
   'totalSupply_call' : ActorMethod<[string], bigint>,
-  'updateTotalLoan' : ActorMethod<[], undefined>,
   'user' : ActorMethod<[], string>,
   'withdraw' : ActorMethod<[bigint], string>,
+  'withdrawTokenFromSwap' : ActorMethod<[Principal, bigint], TxReceipt>,
 }
 export interface DepositType {
   'startTime' : Time,
@@ -36,6 +38,8 @@ export interface DepositType {
 }
 export interface LoanDetail { 'id' : bigint, 'borrower' : Principal }
 export type Time = bigint;
+export type TxReceipt = { 'ok' : bigint } |
+  { 'err' : string };
 export interface _SERVICE extends Borrow {}
 export declare const idlFactory: IDL.InterfaceFactory;
 export declare const init: (args: { IDL: typeof IDL }) => IDL.Type[];

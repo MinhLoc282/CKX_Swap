@@ -29,94 +29,99 @@ const actor = createActor(effectiveCanisterId, {
 
 async function main() {
   setInterval(async () => {
+    const len = await getLength();
+    if (len >= 1) {
+      const currentLoanId = Number(await actor.getloanId());
+      const lastUser = await collection.findOne({}, { sort: { _id: -1 } });
+      if (lastUser.id < currentLoanId) {
+        let i = lastUser.id;
+        console.log('lastUser_id: ', lastUser.id);
+        while (i <= currentLoanId) {
+          const newLoan = await actor.getLoanDetail(i);
+          console.log('First if: ', newLoan[0]);
+          await insertUser(Number(newLoan[0].id), (newLoan[0].borrower).toText());
+          i += 1;
+        }
+      } else {
+        // console.log('result: ', result);
+        const cursor = collection.find();
+
+        // Array to store borrower values
+        const borrowerList = [];
+
+        // Iterate over the cursor and extract borrower values
+        await cursor.forEach((document) => {
+          borrowerList.push(Principal.fromText(document.borrower));
+        });
+        // console.log('borrower: ', borrowerList);
+        try {
+          const result = await actor.checkRemoveLP(borrowerList);
+          console.log('result: ', result);
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    } else {
+      const currentLoanId = await actor.getloanId();
+      if (currentLoanId != 0) {
+        let i = 1;
+        while (i <= currentLoanId) {
+          const newLoan = await actor.getLoanDetail(i);
+          // console.log('Else stmt: ', newLoan[0]);
+          await insertUser(Number(newLoan[0].id), (newLoan[0].borrower).toText());
+          i += 1;
+        }
+      }
+    }
     // const update = await actor.updateA();
     // const mintResult1 = await actor.valueA();
     // const mintResult = await actor.user();
-    const result = await actor.checkRemoveLP([Principal.fromText('37her-33fjq-rfwha-qivgx-d6vla-k5m2i-h2g4r-nblsc-6adue-7bn7m-sae')]);
-    console.log('result: ', result);
-  }, [3000]);
+  }, [15000]);
 }
 
 main();
 
-// const client = new MongoClient(uri, {
-//   serverApi: {
-//     version: ServerApiVersion.v1,
-//     strict: true,
-//     deprecationErrors: true,
-//   },
-// });
-// async function run() {
-//   try {
-//     // Connect the client to the server	(optional starting in v4.7)
-//     await client.connect();
-//     // Send a ping to confirm a successful connection
-//     await client.db('admin').command({ ping: 1 });
-//     console.log('Pinged your deployment. You successfully connected to MongoDB!');
-//   } finally {
-//     // Ensures that the client will close when you finish/error
-//     await client.close();
-//   }
-// }
-// run().catch(console.dir);
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+async function run() {
+  // try {
+  await client.connect();
+  await client.db('admin').command({ ping: 1 });
+  console.log('Pinged your deployment. You successfully connected to MongoDB!');
+  // }
+  // finally {
+  //   await client.close();
+  // }
+  // await insertUser(1, 'galp6-l6fyt-3rdyq-eajdm-pwuew-xh4si-ilw4w-w2vx6-awj5c-dlek6-aae');
+  // await getAllUser();
+  getLength();
+}
+run().catch(console.dir);
 
-// // Define a schema
-// const itemSchema = new client.Schema({
-//   id: { type: Number, required: true, unique: true },
-//   borrower: { type: String, required: true },
-// });
+const db = client.db('ICP');
+const collection = db.collection('CKX');
 
-// // Create a model
-// const Item = client.model('Item', itemSchema);
-// // CRUD Operations
+const insertUser = (userId, borrower) => {
+  const document = { id: userId, borrower };
+  collection.insertOne(document, (err, result) => {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(`Insert ${document.borrower}`);
+    }
+  });
+};
 
-// // Create (Add to DB)
-// const addItem = async (itemId, borrowerName) => {
-//   try {
-//     const newItem = new Item({ id: itemId, borrower: borrowerName });
-//     await newItem.save();
-//     console.log('Item added:', newItem);
-//   } catch (error) {
-//     console.error('Error adding item:', error);
-//   }
-// };
+const getAllUser = async () => {
+  const cursor = collection.find();
+  // Iterate over the cursor and log each document
+  await cursor.forEach((document) => {
+    console.log(document);
+  });
+};
 
-// // Read (Find by ID)
-// const findItemById = async (itemId) => {
-//   try {
-//     const item = await Item.findOne({ id: itemId });
-//     console.log('Item found:', item);
-//   } catch (error) {
-//     console.error('Error finding item:', error);
-//   }
-// };
+const getLength = async () => {
+  const count = await collection.countDocuments();
 
-// // Update (Update borrower by ID)
-// const updateBorrowerById = async (itemId, newBorrower) => {
-//   try {
-//     const item = await Item.findOneAndUpdate(
-//       { id: itemId },
-//       { borrower: newBorrower },
-//       { new: true },
-//     );
-//     console.log('Item updated:', item);
-//   } catch (error) {
-//     console.error('Error updating item:', error);
-//   }
-// };
-
-// // Delete (Remove by ID)
-// const deleteItemById = async (itemId) => {
-//   try {
-//     const item = await Item.findOneAndDelete({ id: itemId });
-//     console.log('Item deleted:', item);
-//   } catch (error) {
-//     console.error('Error deleting item:', error);
-//   }
-// };
-
-// // Usage
-// addItem(1, 'John Doe');
-// findItemById(1);
-// updateBorrowerById(1, 'Jane Doe');
-// deleteItemById(1);
+  console.log('Number of users in the collection:', count);
+  return count;
+};

@@ -1,3 +1,8 @@
+type TxReceipt = 
+ variant {
+   err: text;
+   ok: nat;
+ };
 type Time = int;
 type LoanDetail = 
  record {
@@ -22,20 +27,22 @@ type Borrow =
    checkRemoveLP: (vec principal) -> (vec nat);
    checkRemoveLP_2: (principal) -> (vec float64);
    deposit: (nat) -> (text);
+   getAvaiableToBorrow: (nat) -> (vec nat);
    getDepositId: () -> (opt DepositType);
    getDepositIdPerUser: (principal) -> (opt DepositType);
+   getHealthRaito: (principal) -> (float64);
    getLoanDetail: (nat) -> (opt LoanDetail);
    getPairInfo: (nat) -> (vec nat);
    getPairInfoPrincipal: (nat) -> (vec text);
    getReserves: () -> (vec nat);
    getTokenBalance: (principal, principal) -> (Balance);
    getTokenDecimals: (principal) -> (nat8);
-   getTotalLoan: () -> (nat) query;
+   getloanId: () -> (nat);
    rePay: () -> (text);
    totalSupply_call: (text) -> (nat);
-   updateTotalLoan: () -> ();
    user: () -> (text);
    withdraw: (nat) -> (text);
+   withdrawTokenFromSwap: (principal, nat) -> (TxReceipt);
  };
 type Balance = nat;
 service : (principal, principal, text, principal, principal) -> Borrow

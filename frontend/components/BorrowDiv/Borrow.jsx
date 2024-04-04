@@ -13,6 +13,9 @@ function Borrow(
     borrowInfo,
     balanceLpToken,
     balanceDeposit,
+    healthRatio,
+    avaiBorrow,
+    avaiBorrowTotal,
   },
 ) {
   const [isShow, setIsShow] = React.useState(false);
@@ -75,7 +78,9 @@ function Borrow(
                 <div style={{ height: '43px' }}>
                   <div>
                     <span style={{ fontWeight: 500, fontSize: '18px' }}>
-                      {Math.round(Number(((balanceLpToken) / 10 ** 18)) * 1000) / 1000 || 0}
+                      {Math.round(Number(((balanceLpToken) / 10 ** 18)) * 10000)
+                      / 10000 || 0}
+                      {/* {parseFloat((Number(((balanceLpToken) / 10 ** 18))).toFixed(3)) || 0} */}
                     </span>
                     <span className={styles.MediumTitle}>
                       {' ckBTC <> ckETH LP token'}
@@ -101,16 +106,20 @@ function Borrow(
                 <div>Available to borrow</div>
                 <div style={{ display: 'flex', height: '43px' }}>
                   <div className={styles.BorrowAvaiItem}>
-                    <div>
-                      <span className={styles.largeNum}>0</span>
+                    <div style={{ marginBottom: '-8px' }}>
+                      <span className={styles.largeNum}>
+                        {Math.round(Number(((avaiBorrow[0]) / 10 ** 18)) * 1000) / 1000 || 0}
+                      </span>
                       {' '}
                       <span className={styles.MediumTitle}>ckBTC</span>
                     </div>
                     <div className={styles.TextSmall}>{'< $ 0.01'}</div>
                   </div>
                   <div className={styles.BorrowAvaiItem} style={{ paddingLeft: '24px' }}>
-                    <div>
-                      <span className={styles.largeNum}>0</span>
+                    <div style={{ marginBottom: '-8px' }}>
+                      <span className={styles.largeNum}>
+                        {Math.round(Number(((avaiBorrow[1]) / 10 ** 18)) * 1000) / 1000 || 0}
+                      </span>
                       {' '}
                       <span className={styles.MediumTitle}>ckETH</span>
                     </div>
@@ -122,7 +131,15 @@ function Borrow(
                   <div className={styles.Ellipse} />
                 </button>
                 <div className={styles.TextXSmall}>
-                  based on available LP, you may borrow up to 3.5 ckBTC or 52 ckETH
+                  based on available LP, you may borrow up to
+                  {' '}
+                  {Math.round(Number(((avaiBorrowTotal[0]) / 10 ** 18)) * 1000) / 1000 || 0}
+                  {' '}
+                  ckBTC or
+                  {' '}
+                  {Math.round(Number(((avaiBorrowTotal[1]) / 10 ** 18)) * 1000) / 1000 || 0}
+                  {' '}
+                  ckETH
                 </div>
 
                 <div style={{ display: 'flex', marginTop: '12px' }}>
@@ -149,7 +166,9 @@ function Borrow(
                       </svg>
                     </div>
                     <div style={{ color: '#83BD67', fontSize: '18px', fontWeight: 500 }}>
-                      35.2%
+                      {borrowInfo.isActive && healthRatio
+                        ? Math.round(Number(healthRatio) * 100) / 100 : 0}
+                      %
                     </div>
                   </div>
                 </div>
@@ -197,6 +216,9 @@ Borrow.propTypes = {
   borrowInfo: PropTypes.object,
   balanceLpToken: PropTypes.number,
   balanceDeposit: PropTypes.number,
+  healthRatio: PropTypes.number,
+  avaiBorrow: PropTypes.array,
+  avaiBorrowTotal: PropTypes.array,
 };
 
 Borrow.defaultProps = {
@@ -204,6 +226,9 @@ Borrow.defaultProps = {
   balanceLpToken: 0,
   balanceDeposit: 0,
   borrowInfo: {},
+  healthRatio: 0,
+  avaiBorrow: [0, 0],
+  avaiBorrowTotal: [0, 0],
 };
 
 export default Borrow;

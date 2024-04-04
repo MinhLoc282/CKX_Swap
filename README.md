@@ -20,8 +20,8 @@ dfx start --clean
 # dfx deps init --argument '(null)' internet-identity
 # dfx deps deploy
 
-dfx deploy --no-wallet
 # mops install
+dfx deploy internet_identity --no-wallet
 dfx canister create --all
 dfx build
 ```
@@ -96,7 +96,7 @@ npm run dev
 
 ### Transfer token command
 ```bash
-dfx canister call token0 icrc1_transfer '(record {  to = record {owner=principal "<Replace with your principal-id>"}; amount= 1_000_000_000_000_000_000 })'
+dfx canister call token0 icrc1_transfer '(record {  to = record {owner=principal "bw4dl-smaaa-aaaaa-qaacq-cai"}; amount= 2_000_000_000_000_000_000 })'
 
-dfx canister call token1 icrc1_transfer '(record {  to = record {owner=principal "<Replace with your principal-id>"}; amount= 1_000_000_000_000_000_000 })'
+dfx canister call token1 icrc1_transfer '(record {  to = record {owner=principal "bw4dl-smaaa-aaaaa-qaacq-cai"}; amount= 2_000_000_000_000_000_000 })'
 ```

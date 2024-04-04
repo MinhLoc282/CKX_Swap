@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 
 import { Principal } from '@dfinity/principal';
 import { useAuth } from '../../../hooks/use-auth-client';
+import * as swap from '../../../../src/declarations/swap';
 
 // import * as swap from '../../../../src/declarations/swap';
 import { getAmountOutMin } from '../../../utils';
@@ -36,7 +37,9 @@ function SwapModal({
   slippage,
   clearAll,
 }) {
-  const { principal, swapActor } = useAuth();
+  const {
+    principal, swapActor, token0Actor,
+  } = useAuth();
 
   const [tokens, setTokens] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -52,14 +55,39 @@ function SwapModal({
     try {
       setLoading(true);
 
+      // const record = {
+      //   fee: [],
+      //   memo: [],
+      //   from_subaccount: [],
+      //   created_at_time: [],
+      //   amount: formValues.amountIn * 10 ** 18,
+      //   expected_allowance: [],
+      //   expires_at: [],
+      //   spender: Principal.fromText(swap.canisterId),
+      // };
+      // await token0Actor.icrc2_approve(
+      //   record,
+      // );
+      // await swapActor.deposit(
+      //   Principal.fromText(formValues.token0),
+      //   Math.floor(formValues.amountIn * 10 ** 18),
+      // );
+
       // const timestamp = Math.floor(new Date().getTime() / 1000) + 600;
       const timestamp = Math.floor(new Date().getTime() * 1000000000) + 600;
 
-      const AmountOutMin = await getAmountOutMin(formValues, swapActor, Principal);
+      const tempFormvalue = {
+        token0: formValues.token0,
+        token1: formValues.token1,
+        amountIn: formValues.amountIn * 10 ** 18,
+        amountOutMin: formValues.amountOutMin * 10 ** 18,
+      };
+
+      const AmountOutMin = await getAmountOutMin(tempFormvalue, swapActor, Principal);
 
       console.log('Output Amount: ', AmountOutMin);
-      console.log('formValues.amountOutMin: ', formValues.amountOutMin);
-      const PE = formValues.amountIn * price;
+      console.log('formValues.amountOutMin: ', tempFormvalue.amountOutMin);
+      const PE = tempFormvalue.amountIn * price;
       const minSlippage = (PE - AmountOutMin) / PE;
 
       console.log('slippage: ', slippage);
@@ -74,19 +102,19 @@ function SwapModal({
         }
       }
 
-      // console.log('CHECK: ', formValues.amountIn, ' ', AmountOutMin, '', minSlippage);
+      // console.log('CHECK: ', tempFormvalue.amountIn, ' ', AmountOutMin, '', minSlippage);
       const res = await swapActor.swapExactTokensForTokens(
-        Math.floor(formValues.amountIn),
-        // formValues.amountOutMin,
+        Math.floor(tempFormvalue.amountIn),
+        // tempFormvalue.amountOutMin,
         Math.floor(AmountOutMin - (AmountOutMin * Math.abs(minSlippage))),
-        [Principal.fromText(formValues.token0).toString(),
-          Principal.fromText(formValues.token1).toString()],
+        [Principal.fromText(tempFormvalue.token0).toString(),
+          Principal.fromText(tempFormvalue.token1).toString()],
         principal,
         timestamp,
       );
 
-      console.log('token0: ', Principal.fromText(formValues.token0).toString());
-      console.log('token1: ', Principal.fromText(formValues.token1).toString());
+      console.log('token0: ', Principal.fromText(tempFormvalue.token0).toString());
+      console.log('token1: ', Principal.fromText(tempFormvalue.token1).toString());
       // console.log('caller: ', principal.toString());
 
       setLoading(false);

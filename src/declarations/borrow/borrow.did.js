@@ -13,6 +13,7 @@ export const idlFactory = ({ IDL }) => {
   });
   const LoanDetail = IDL.Record({ 'id' : IDL.Nat, 'borrower' : IDL.Principal });
   const Balance = IDL.Nat;
+  const TxReceipt = IDL.Variant({ 'ok' : IDL.Nat, 'err' : IDL.Text });
   const Borrow = IDL.Service({
     'borrow' : IDL.Func([IDL.Nat, IDL.Principal], [IDL.Text], []),
     'checkRemoveLP' : IDL.Func(
@@ -22,24 +23,30 @@ export const idlFactory = ({ IDL }) => {
       ),
     'checkRemoveLP_2' : IDL.Func([IDL.Principal], [IDL.Vec(IDL.Float64)], []),
     'deposit' : IDL.Func([IDL.Nat], [IDL.Text], []),
+    'getAvaiableToBorrow' : IDL.Func([IDL.Nat], [IDL.Vec(IDL.Nat)], []),
     'getDepositId' : IDL.Func([], [IDL.Opt(DepositType)], []),
     'getDepositIdPerUser' : IDL.Func(
         [IDL.Principal],
         [IDL.Opt(DepositType)],
         [],
       ),
+    'getHealthRaito' : IDL.Func([IDL.Principal], [IDL.Float64], []),
     'getLoanDetail' : IDL.Func([IDL.Nat], [IDL.Opt(LoanDetail)], []),
     'getPairInfo' : IDL.Func([IDL.Nat], [IDL.Vec(IDL.Nat)], []),
     'getPairInfoPrincipal' : IDL.Func([IDL.Nat], [IDL.Vec(IDL.Text)], []),
     'getReserves' : IDL.Func([], [IDL.Vec(IDL.Nat)], []),
     'getTokenBalance' : IDL.Func([IDL.Principal, IDL.Principal], [Balance], []),
     'getTokenDecimals' : IDL.Func([IDL.Principal], [IDL.Nat8], []),
-    'getTotalLoan' : IDL.Func([], [IDL.Nat], ['query']),
+    'getloanId' : IDL.Func([], [IDL.Nat], []),
     'rePay' : IDL.Func([], [IDL.Text], []),
     'totalSupply_call' : IDL.Func([IDL.Text], [IDL.Nat], []),
-    'updateTotalLoan' : IDL.Func([], [], []),
     'user' : IDL.Func([], [IDL.Text], []),
     'withdraw' : IDL.Func([IDL.Nat], [IDL.Text], []),
+    'withdrawTokenFromSwap' : IDL.Func(
+        [IDL.Principal, IDL.Nat],
+        [TxReceipt],
+        [],
+      ),
   });
   return Borrow;
 };

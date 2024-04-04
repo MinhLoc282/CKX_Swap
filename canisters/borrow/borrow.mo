@@ -40,7 +40,7 @@ shared (msg) actor class Borrow(
 
     private var swap_id : Text = _swap_id;
 
-    private var loanId = 1;
+    private var loanId = 0;
 
     public type TxReceipt = Result.Result<Nat, Text>;
     type DepositType = {
@@ -745,153 +745,157 @@ shared (msg) actor class Borrow(
             let maybeDepositType = depositInfoLpToken.get(principal);
             switch (maybeDepositType) {
                 case (?r) {
+                    if (r.reserve0 == 0 or r.reserve1 == 1) {
+                        rtArr := Array.append(rtArr, [3])
+                    } else {
 
-                    var at_borrow_rate : Float = Float.fromInt(r.reserve0) / Float.fromInt(r.reserve1);
+                        var at_borrow_rate : Float = Float.fromInt(r.reserve0) / Float.fromInt(r.reserve1);
 
-                    if (Float.abs(rate - at_borrow_rate) > remove_rate) {
-                        // remove lp
-                        var aggregtor_canister = actor (Principal.toText(aggregator_id)) : actor {
-                            removeLP(
-                                token0 : Principal,
-                                token1 : Principal,
-                                lpAmount : Nat,
-                                amount0Min : Nat,
-                                amount1Min : Nat,
-                                to : Principal,
-                                deadline : Int,
-                            ) : async Text;
-                            icrc2_approve(args : ICRC1.ApproveArgs) : async ICRC1.ApproveResult
-                        };
-                        var apprArg : ICRC1.ApproveArgs = {
-                            from_subaccount = null;
-                            spender = aggregator_id;
-                            amount = r.amount;
-                            expires_at = null;
-                            fee = null;
-                            memo = null;
-                            created_at_time = null;
-                            expected_allowance = null
-                        };
-                        var approve = await aggregtor_canister.icrc2_approve(apprArg);
-                        var remove_call = await aggregtor_canister.removeLP(
-                            token0,
-                            token1,
-                            r.amount,
-                            0,
-                            0,
-                            Principal.fromActor(this),
-                            Time.now() + 10000000000,
-                        );
-                        if (remove_call == "Ok") {
-                            /// transfer token
-                            try {
-                                var token0_canister = actor (Principal.toText(token0)) : actor {
-                                    icrc1_transfer(args : ICRC1.TransferArgs) : async ICRC1.TransferResult
-                                };
-                                var token1_canister = actor (Principal.toText(token1)) : actor {
-                                    icrc1_transfer(args : ICRC1.TransferArgs) : async ICRC1.TransferResult
-                                };
-                                var swap_canister = actor (swap_id) : actor {
-                                    withdraw(tokenId : Principal, value : Nat) : async TxReceipt
-                                };
-                                var defaultSubaccount : Blob = Utils.defaultSubAccount();
-                                Debug.print("PreCheck:");
-                                var value0 = (r.amount * reserve0 / totalSupply);
-                                var value1 = (r.amount * reserve1 / totalSupply);
-                                Debug.print(debug_show ((value0 - r.borrow, value1 - r.borrow)));
-                                Debug.print("End preCheck:");
-                                if (r.tokenIdBorrow == token0) {
-                                    var withdrawToken0 = await swap_canister.withdraw(token0, value0);
-                                    var withdrawToken1 = await swap_canister.withdraw(token1, value1);
-                                    Debug.print("Check 1:");
-                                    Debug.print(debug_show ((withdrawToken0, withdrawToken1)));
-                                    var transferArg : ICRC1.TransferArgs = {
-                                        from_subaccount = null;
-                                        created_at_time = null;
-                                        fee = null;
-                                        memo = null;
-                                        to = {
-                                            owner = principal;
-                                            subaccount = ?defaultSubaccount
-                                        };
-                                        amount = value0 - r.borrow
-                                    };
-                                    var txResult = await token0_canister.icrc1_transfer(transferArg);
-                                    var transferArg1 : ICRC1.TransferArgs = {
-                                        from_subaccount = null;
-                                        created_at_time = null;
-                                        fee = null;
-                                        memo = null;
-                                        to = {
-                                            owner = principal;
-                                            subaccount = ?defaultSubaccount
-                                        };
-                                        amount = value1
-                                    };
-                                    var txResult1 = await token1_canister.icrc1_transfer(transferArg1)
-                                } else {
-                                    var withdrawToken0 = await swap_canister.withdraw(token0, value0);
-                                    var withdrawToken1 = await swap_canister.withdraw(token1, value1);
-                                    Debug.print("Check 2:");
-                                    Debug.print(debug_show ((withdrawToken0, withdrawToken1)));
+                        if (Float.abs(rate - at_borrow_rate) > remove_rate) {
+                            // remove lp
+                            var aggregtor_canister = actor (Principal.toText(aggregator_id)) : actor {
+                                removeLP(
+                                    token0 : Principal,
+                                    token1 : Principal,
+                                    lpAmount : Nat,
+                                    amount0Min : Nat,
+                                    amount1Min : Nat,
+                                    to : Principal,
+                                    deadline : Int,
+                                ) : async Text;
+                                icrc2_approve(args : ICRC1.ApproveArgs) : async ICRC1.ApproveResult
+                            };
+                            var apprArg : ICRC1.ApproveArgs = {
+                                from_subaccount = null;
+                                spender = aggregator_id;
+                                amount = r.amount;
+                                expires_at = null;
+                                fee = null;
+                                memo = null;
+                                created_at_time = null;
+                                expected_allowance = null
+                            };
+                            var approve = await aggregtor_canister.icrc2_approve(apprArg);
+                            var remove_call = await aggregtor_canister.removeLP(
+                                token0,
+                                token1,
+                                r.amount,
+                                0,
+                                0,
+                                Principal.fromActor(this),
+                                Time.now() + 10000000000,
+                            );
+                            if (remove_call == "Ok") {
+                                /// transfer token
+                                try {
                                     var token0_canister = actor (Principal.toText(token0)) : actor {
                                         icrc1_transfer(args : ICRC1.TransferArgs) : async ICRC1.TransferResult
                                     };
                                     var token1_canister = actor (Principal.toText(token1)) : actor {
                                         icrc1_transfer(args : ICRC1.TransferArgs) : async ICRC1.TransferResult
                                     };
+                                    var swap_canister = actor (swap_id) : actor {
+                                        withdraw(tokenId : Principal, value : Nat) : async TxReceipt
+                                    };
                                     var defaultSubaccount : Blob = Utils.defaultSubAccount();
-                                    var transferArg : ICRC1.TransferArgs = {
-                                        from_subaccount = null;
-                                        created_at_time = null;
-                                        fee = null;
-                                        memo = null;
-                                        to = {
-                                            owner = principal;
-                                            subaccount = ?defaultSubaccount
+                                    Debug.print("PreCheck:");
+                                    var value0 = (r.amount * reserve0 / totalSupply);
+                                    var value1 = (r.amount * reserve1 / totalSupply);
+                                    Debug.print(debug_show ((value0 - r.borrow, value1 - r.borrow)));
+                                    Debug.print("End preCheck:");
+                                    if (r.tokenIdBorrow == token0) {
+                                        var withdrawToken0 = await swap_canister.withdraw(token0, value0);
+                                        var withdrawToken1 = await swap_canister.withdraw(token1, value1);
+                                        Debug.print("Check 1:");
+                                        Debug.print(debug_show ((withdrawToken0, withdrawToken1)));
+                                        var transferArg : ICRC1.TransferArgs = {
+                                            from_subaccount = null;
+                                            created_at_time = null;
+                                            fee = null;
+                                            memo = null;
+                                            to = {
+                                                owner = principal;
+                                                subaccount = ?defaultSubaccount
+                                            };
+                                            amount = value0 - r.borrow
                                         };
-                                        amount = value0
-                                    };
-                                    var txResult = await token0_canister.icrc1_transfer(transferArg);
-                                    var transferArg1 : ICRC1.TransferArgs = {
-                                        from_subaccount = null;
-                                        created_at_time = null;
-                                        fee = null;
-                                        memo = null;
-                                        to = {
-                                            owner = principal;
-                                            subaccount = ?defaultSubaccount
+                                        var txResult = await token0_canister.icrc1_transfer(transferArg);
+                                        var transferArg1 : ICRC1.TransferArgs = {
+                                            from_subaccount = null;
+                                            created_at_time = null;
+                                            fee = null;
+                                            memo = null;
+                                            to = {
+                                                owner = principal;
+                                                subaccount = ?defaultSubaccount
+                                            };
+                                            amount = value1
                                         };
-                                        amount = value1 - r.borrow
+                                        var txResult1 = await token1_canister.icrc1_transfer(transferArg1)
+                                    } else {
+                                        var withdrawToken0 = await swap_canister.withdraw(token0, value0);
+                                        var withdrawToken1 = await swap_canister.withdraw(token1, value1);
+                                        Debug.print("Check 2:");
+                                        Debug.print(debug_show ((withdrawToken0, withdrawToken1)));
+                                        var token0_canister = actor (Principal.toText(token0)) : actor {
+                                            icrc1_transfer(args : ICRC1.TransferArgs) : async ICRC1.TransferResult
+                                        };
+                                        var token1_canister = actor (Principal.toText(token1)) : actor {
+                                            icrc1_transfer(args : ICRC1.TransferArgs) : async ICRC1.TransferResult
+                                        };
+                                        var defaultSubaccount : Blob = Utils.defaultSubAccount();
+                                        var transferArg : ICRC1.TransferArgs = {
+                                            from_subaccount = null;
+                                            created_at_time = null;
+                                            fee = null;
+                                            memo = null;
+                                            to = {
+                                                owner = principal;
+                                                subaccount = ?defaultSubaccount
+                                            };
+                                            amount = value0
+                                        };
+                                        var txResult = await token0_canister.icrc1_transfer(transferArg);
+                                        var transferArg1 : ICRC1.TransferArgs = {
+                                            from_subaccount = null;
+                                            created_at_time = null;
+                                            fee = null;
+                                            memo = null;
+                                            to = {
+                                                owner = principal;
+                                                subaccount = ?defaultSubaccount
+                                            };
+                                            amount = value1 - r.borrow
+                                        };
+                                        var txResult1 = await token1_canister.icrc1_transfer(transferArg1)
                                     };
-                                    var txResult1 = await token1_canister.icrc1_transfer(transferArg1)
+
+                                    var newDepInform : DepositType = {
+                                        amount = 0;
+                                        startTime = r.startTime;
+                                        isActive = false;
+                                        tokenIdBorrow = r.tokenIdBorrow;
+                                        borrow = 0;
+                                        isUsing = false;
+                                        isAllowWithdraw = false;
+                                        reserve0 = 0;
+                                        reserve1 = 0
+                                    };
+                                    depositInfoLpToken.put(principal, newDepInform);
+                                    rtArr := Array.append(rtArr, [1])
+                                } catch (error) {
+                                    rtArr := Array.append(rtArr, [4])
                                 };
 
-                                var newDepInform : DepositType = {
-                                    amount = 0;
-                                    startTime = r.startTime;
-                                    isActive = false;
-                                    tokenIdBorrow = r.tokenIdBorrow;
-                                    borrow = r.borrow;
-                                    isUsing = false;
-                                    isAllowWithdraw = false;
-                                    reserve0 = r.reserve0;
-                                    reserve1 = r.reserve1
-                                };
-                                depositInfoLpToken.put(principal, newDepInform);
-                                rtArr := Array.append(rtArr, [1])
-                            } catch (error) {
-                                rtArr := Array.append(rtArr, [4])
-                            };
-
+                            } else {
+                                rtArr := Array.append(rtArr, [2])
+                            }
                         } else {
-                            rtArr := Array.append(rtArr, [2])
-                        }
-                    } else {
-                        // skip
-                        rtArr := Array.append(rtArr, [3])
-                    };
+                            // skip
+                            rtArr := Array.append(rtArr, [3])
+                        };
 
+                    }
                 };
                 case null {
                     // No DepositType found for this Principal
@@ -921,14 +925,33 @@ shared (msg) actor class Borrow(
         }
     };
 
-    private var totalLoan : Nat = 1;
+    public func getHealthRaito(user : Principal) : async Float {
+        var pair_reserve = await getReserves();
+        var reserve0 = pair_reserve[0];
+        var reserve1 = pair_reserve[1];
+        if (reserve0 == 0 or reserve1 == 0) return 0;
+        var rate = Float.fromInt(reserve0) / Float.fromInt(reserve1);
+        let maybeDepositType = depositInfoLpToken.get(user);
+        switch (maybeDepositType) {
+            case (?r) {
 
-    public func updateTotalLoan() : async () {
-        totalLoan += 1
+                var at_borrow_rate : Float = Float.fromInt(r.reserve0) / Float.fromInt(r.reserve1);
+
+                return Float.abs(rate - at_borrow_rate)
+            };
+            case (null) {
+                return 0
+            }
+        }
     };
 
-    public query func getTotalLoan() : async Nat {
-        return totalLoan
+    public func getloanId() : async Nat {
+        return loanId;
+    };
+
+    public func getAvaiableToBorrow(lpValue : Nat) : async [Nat] {
+        let pair = await getPairInfo(lpValue);
+        return [pair[0] * 60 / 100, pair[1] * 60 / 100];
     };
 
     public shared (msg) func user() : async Text {
@@ -947,8 +970,9 @@ shared (msg) actor class Borrow(
         // reserve1 : Nat,
         borrower : Principal,
     ) {
+        loanId += 1;
         var newLoanInform : LoanDetail = {
-            id = id;
+            id = loanId;
             // startTime = startTime;
             // isActive = isActive;
             // tokenIdBorrow = tokenIdBorrow;
@@ -959,8 +983,7 @@ shared (msg) actor class Borrow(
             // reserve1 = reserve1
             borrower = borrower
         };
-        loanDetailList.put(id, newLoanInform);
-        loanId += 1
+        loanDetailList.put(loanId, newLoanInform);
     };
 
     public func getLoanDetail(id : Nat) : async ?LoanDetail {
@@ -972,6 +995,6 @@ shared (msg) actor class Borrow(
             withdraw(tokenId : Principal, value : Nat) : async TxReceipt
         };
         var withdrawToken = await swap_canister.withdraw(tokenId, value);
-        return withdrawToken;
+        return withdrawToken
     }
 }
