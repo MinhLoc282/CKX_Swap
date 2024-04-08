@@ -4,7 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import { readFile } from 'fs/promises';
 const dfxJson = JSON.parse(
-  await readFile(new URL('../dfx.json', import.meta.url))
+  await readFile(new URL('./dfx.json', import.meta.url))
 );
 
 const isDev = process.env.DFX_NETWORK !== 'ic';
