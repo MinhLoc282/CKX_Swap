@@ -11,7 +11,13 @@ const uri = 'mongodb+srv://devckx:8e1PWJamFy8iM3o3@cluster0.8uitpxr.mongodb.net/
 
 // Require syntax is needed for JSON file imports
 const require = createRequire(import.meta.url);
-const localCanisterIds = require('../../.dfx/local/canister_ids.json');
+const isDev = process.env.DFX_NETWORK !== 'ic';
+let localCanisterIds;
+if (isDev) {
+  localCanisterIds = require('../../.dfx/local/canister_ids.json');
+} else {
+  localCanisterIds = require('../../canister_ids.json');
+}
 
 // Use `process.env` if available provoded, or fall back to local
 const effectiveCanisterId = canisterId?.toString() ?? localCanisterIds.borrow.local;

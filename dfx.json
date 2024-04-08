@@ -42,7 +42,8 @@
         "entrypoint": "dist/index.html"
       },
       "source": [
-        "dist/"
+        "dist/",
+        "frontend/assets/"
       ],
       "type": "assets"
     }
