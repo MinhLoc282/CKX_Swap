@@ -9,7 +9,7 @@ const dfxJson = require('./dfx.json');
 
 const isDev = process.env.DFX_NETWORK !== 'ic';
 
-const __dirname = import.meta.dirname;
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 let canisterIds;
 try {
