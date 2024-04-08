@@ -12,6 +12,9 @@ import SwapModal from './SwapModal/SwapModal';
 import { getTokenFromPair } from '../../utils';
 import SettingModal from './SettingModal/SettingModal';
 
+import ckBTC from '../../assets/ckBTC.png';
+import ckETH from '../../assets/ckETH.png';
+
 function SwapPage() {
   const validation = useFormik({
     initialValues: {
@@ -266,8 +269,8 @@ function SwapPage() {
                   />
                   <button type="button" onClick={() => openTokenModal('0')}>
                     <div style={{ display: 'flex' }}>
-                      {selectedToken0Name && selectedToken0Name === 'ckBTC' && <img alt="logo" src="/frontend/assets/ckBTC.png" />}
-                      {selectedToken0Name && selectedToken0Name === 'ckETH' && <img alt="logo" src="/frontend/assets/ckETH.png" />}
+                      {selectedToken0Name && selectedToken0Name === 'ckBTC' && <img alt="logo" src={ckBTC} />}
+                      {selectedToken0Name && selectedToken0Name === 'ckETH' && <img alt="logo" src={ckETH} />}
                       <p>{selectedToken0Name || 'Select Token'}</p>
                     </div>
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -307,8 +310,8 @@ function SwapPage() {
                   />
                   <button type="button" onClick={() => openTokenModal('1')}>
                     <div style={{ display: 'flex' }}>
-                      {selectedToken1Name && selectedToken1Name === 'ckBTC' && <img alt="logo" src="/frontend/assets/ckBTC.png" />}
-                      {selectedToken1Name && selectedToken1Name === 'ckETH' && <img alt="logo" src="/frontend/assets/ckETH.png" />}
+                      {selectedToken1Name && selectedToken1Name === 'ckBTC' && <img alt="logo" src={ckBTC} />}
+                      {selectedToken1Name && selectedToken1Name === 'ckETH' && <img alt="logo" src={ckETH} />}
                       <p>{selectedToken1Name || 'Select Token'}</p>
                     </div>
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

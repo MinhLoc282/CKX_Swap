@@ -7,6 +7,11 @@ import BottomLend from './BottomLend';
 
 import { useAuth } from '../../hooks/use-auth-client';
 
+import ckBTC from '../../assets/ckBTC.png';
+import ckETH from '../../assets/ckETH.png';
+import dckBTC from '../../assets/d.ckBTC.png';
+import dckETH from '../../assets/d.ckETH.png';
+
 function LendPage() {
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
   const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
@@ -149,7 +154,7 @@ function LendPage() {
               className={switchPage === 'ckBTC' ? styles.HeaderSwitchItemOn : styles.HeaderSwitchItemOff}
               onClick={() => setSwitchPage('ckBTC')}
             >
-              <img width={24} height={24} src="/frontend/assets/ckBTC.png" alt="" />
+              <img width={24} height={24} src={ckBTC} alt="" />
               <div>ckBTC</div>
             </button>
             <button
@@ -157,7 +162,7 @@ function LendPage() {
               className={switchPage === 'ckETH' ? styles.HeaderSwitchItemOn : styles.HeaderSwitchItemOff}
               onClick={() => setSwitchPage('ckETH')}
             >
-              <img width={24} height={24} src="/frontend/assets/ckETH.png" alt="" />
+              <img width={24} height={24} src={ckETH} alt="" />
               <div>ckETH</div>
             </button>
           </div>
@@ -167,8 +172,8 @@ function LendPage() {
             <div className={styles.DepositUpper}>
               <div className={styles.TokenDiv}>
                 {switchPage === 'ckETH'
-                  ? <img width={24} height={24} src="/frontend/assets/ckETH.png" alt="" />
-                  : <img width={24} height={24} src="/frontend/assets/ckBTC.png" alt="" />}
+                  ? <img width={24} height={24} src={ckETH} alt="" />
+                  : <img width={24} height={24} src={ckBTC} alt="" />}
                 <div>
                   {' '}
                   {switchPage === 'ckETH' ? 'ckETH' : 'ckBTC'}
@@ -205,8 +210,8 @@ function LendPage() {
             <div className={styles.WithdrawUpper}>
               <div className={styles.TokenDiv}>
                 {switchPage === 'ckETH'
-                  ? <img width={24} height={24} src="/frontend/assets/d.ckETH.png" alt="" />
-                  : <img width={24} height={24} src="/frontend/assets/d.ckBTC.png" alt="" />}
+                  ? <img width={24} height={24} src={dckETH} alt="" />
+                  : <img width={24} height={24} src={dckBTC} alt="" />}
                 <div>
                   {' '}
                   {switchPage === 'ckETH' ? 'd.ckETH' : 'd.ckBTC'}
@@ -235,8 +240,8 @@ function LendPage() {
             <div className={styles.ClaimUpper}>
               <div className={styles.TokenDiv}>
                 {switchPage === 'ckETH'
-                  ? <img width={24} height={24} src="/frontend/assets/ckETH.png" alt="" />
-                  : <img width={24} height={24} src="/frontend/assets/ckBTC.png" alt="" />}
+                  ? <img width={24} height={24} src={ckETH} alt="" />
+                  : <img width={24} height={24} src={ckBTC} alt="" />}
                 <div>
                   {' '}
                   {switchPage === 'ckETH' ? 'ckETH' : 'ckBTC'}

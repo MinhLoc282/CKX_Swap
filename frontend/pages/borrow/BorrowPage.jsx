@@ -14,6 +14,9 @@ import * as aggregator from '../../../src/declarations/aggregator';
 
 import { useAuth } from '../../hooks/use-auth-client';
 
+import ckBTC from '../../assets/ckBTC.png';
+import ckETH from '../../assets/ckETH.png';
+
 function BorrowPage() {
   const [isBorrowModalOpen, setIsBorrowModalOpen] = useState(false);
   const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
@@ -120,22 +123,22 @@ function BorrowPage() {
           <div className={styles.HeaderLeft}>
             <div className={styles.HeaderTitle}>TOTAL SUPPLIED</div>
             <div className={styles.Headerdiv}>
-              <img src="/frontend/assets/ckBTC.png" width={24} height={24} alt="" />
+              <img src={ckBTC} width={24} height={24} alt="" />
               <div className={styles.MTop}>50.2 ckBTC</div>
             </div>
             <div className={styles.Headerdiv}>
-              <img src="/frontend/assets/ckETH.png" width={24} height={24} alt="" />
+              <img src={ckETH} width={24} height={24} alt="" />
               <div className={styles.MTop}>24 ckETH</div>
             </div>
           </div>
           <div className={styles.HeaderMiddle}>
             <div className={styles.HeaderTitle}>AVAILABLE FOR BORROWING</div>
             <div className={styles.Headerdiv}>
-              <img src="/frontend/assets/ckBTC.png" width={24} height={24} alt="" />
+              <img src={ckBTC} width={24} height={24} alt="" />
               <div className={styles.MTop}>50.2 ckBTC</div>
             </div>
             <div className={styles.Headerdiv}>
-              <img src="/frontend/assets/ckETH.png" width={24} height={24} alt="" />
+              <img src={ckETH} width={24} height={24} alt="" />
               <div className={styles.MTop}>24 ckETH</div>
             </div>
           </div>

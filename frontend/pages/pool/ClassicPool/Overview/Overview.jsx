@@ -7,6 +7,9 @@ import {
 } from '../Utils';
 import styles from './index.module.css';
 
+import ckBTC from '../../assets/ckBTC.png';
+import ckETH from '../../assets/ckETH.png';
+
 function Overview() {
   return (
     <div>
@@ -30,9 +33,9 @@ function Overview() {
           <div className={styles.RightFirstRowElement}>
             <div className={styles.RightTitle}>Current Exchange Rate</div>
             <div style={{ marginTop: '18px', display: 'flex', gap: '8px' }}>
-              <img src="/frontend/assets/ckBTC.png" width={32} alt="" />
+              <img src={ckBTC} width={32} alt="" />
               <div style={{ marginTop: '8px' }}>1 ckBTC =</div>
-              <img src="/frontend/assets/ckETH.png" width={32} alt="" />
+              <img src={ckETH} width={32} alt="" />
               <div style={{ marginTop: '8px' }}>18 ckETH</div>
             </div>
           </div>
@@ -41,12 +44,12 @@ function Overview() {
             <div style={{ marginTop: '18px' }}>
               <div style={{ display: 'flex', gap: '10px' }}>
                 <FiftyPercent />
-                <img src="/frontend/assets/ckBTC.png" width={24} height={24} alt="" />
+                <img src={ckBTC} width={24} height={24} alt="" />
                 <div style={{ alignSelf: 'center' }}>17,003,450.69 USDC</div>
               </div>
               <div style={{ display: 'flex', gap: '10px', marginTop: '12px' }}>
                 <FiftyPercent />
-                <img src="/frontend/assets/ckETH.png" width={24} height={24} alt="" />
+                <img src={ckETH} width={24} height={24} alt="" />
                 <div style={{ alignSelf: 'center' }}>17,003,450.69 USDC</div>
               </div>
             </div>

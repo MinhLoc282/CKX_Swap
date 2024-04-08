@@ -4,6 +4,8 @@ import {
 } from '../Utils';
 import styles from './index.module.css';
 
+import WithdrawImg from '../../../../assets/withdraw.png';
+
 function Withdraw() {
   return (
     <div>
@@ -15,7 +17,7 @@ function Withdraw() {
         Withdraw to receive pool tokens and earned trading fees.
       </div>
       <div style={{ marginTop: '32px' }}>
-        <img src="/frontend/assets/withdraw.png" width="60%" alt="" />
+        <img src={WithdrawImg} width="60%" alt="" />
       </div>
     </div>
   );

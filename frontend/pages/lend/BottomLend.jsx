@@ -2,6 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styles from './index.module.css';
 
+import ckBTC from '../../assets/d.ckBTC.png';
+import ckETH from '../../assets/d.ckETH.png';
+
 function BottomLend(
   { switchPage },
 ) {
@@ -41,8 +44,8 @@ function BottomLend(
 
             </div>
             <div style={{ display: 'flex', justifyContent: 'end', gap: '10px' }}>
-              {switchPage === 'ckETH' ? <img width={32} height={32} src="/frontend/assets/d.ckETH.png" alt="" />
-                : <img width={32} height={32} src="/frontend/assets/d.ckBTC.png" alt="" />}
+              {switchPage === 'ckETH' ? <img width={32} height={32} src={ckETH} alt="" />
+                : <img width={32} height={32} src={ckBTC} alt="" />}
               <div style={{ color: 'rgba(204, 204, 204, 1)', fontSize: '24px' }}>17,973,373.37</div>
             </div>
           </div>
@@ -74,8 +77,8 @@ function BottomLend(
                 color: 'rgba(204, 204, 204, 1)', fontSize: '24px', display: 'flex', gap: '10px', justifyContent: 'end',
               }}
               >
-                {switchPage === 'ckETH' ? <img width={32} height={32} src="/frontend/assets/d.ckETH.png" alt="" />
-                  : <img width={32} height={32} src="/frontend/assets/d.ckBTC.png" alt="" />}
+                {switchPage === 'ckETH' ? <img width={32} height={32} src={ckETH} alt="" />
+                  : <img width={32} height={32} src={ckBTC} alt="" />}
                 <div style={{ marginTop: '4px', fontWeight: 500 }}>96.72</div>
               </div>
             </div>
@@ -94,8 +97,8 @@ function BottomLend(
                 color: 'rgba(204, 204, 204, 1)', fontSize: '24px', display: 'flex', gap: '10px', justifyContent: 'end',
               }}
               >
-                {switchPage === 'ckETH' ? <img width={32} height={32} src="/frontend/assets/d.ckETH.png" alt="" />
-                  : <img width={32} height={32} src="/frontend/assets/d.ckBTC.png" alt="" />}
+                {switchPage === 'ckETH' ? <img width={32} height={32} src={ckETH} alt="" />
+                  : <img width={32} height={32} src={ckBTC} alt="" />}
                 <div style={{ marginTop: '4px', fontWeight: 500 }}>96.72</div>
               </div>
             </div>

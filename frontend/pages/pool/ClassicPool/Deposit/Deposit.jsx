@@ -4,6 +4,8 @@ import {
 } from '../Utils';
 import styles from './index.module.css';
 
+import DepositImg from '../../../../assets/deposit.png';
+
 function Deposit() {
   return (
     <div>
@@ -15,7 +17,7 @@ function Deposit() {
         Deposit tokens to start earning trading fees and more rewards.
       </div>
       <div style={{ marginTop: '32px' }}>
-        <img src="/frontend/assets/deposit.png" width="60%" alt="" />
+        <img src={DepositImg} width="60%" alt="" />
       </div>
       {/* <div className={styles.Deposit}>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>

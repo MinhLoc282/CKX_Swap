@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import styles from './index.module.css';
 import BottomBorrow from './BottomBorrow/BottomBorrow';
 
+import Graph from '../../assets/Graph.png';
+
 function Borrow(
   {
     openBorrowModal,
@@ -71,7 +73,7 @@ function Borrow(
       {isShow
         && (
           <div>
-            <img width="100%" src="/frontend/assets/Graph.png" alt="" />
+            <img width="100%" src={Graph} alt="" />
             <div className={styles.ModalControls}>
               <div className={styles.ModalControlsItem}>
                 <div>Available to supply</div>

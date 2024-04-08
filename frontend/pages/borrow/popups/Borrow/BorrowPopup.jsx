@@ -13,6 +13,9 @@ import { useAuth } from '../../../../hooks/use-auth-client';
 import * as token0 from '../../../../../src/declarations/token0';
 import * as token1 from '../../../../../src/declarations/token1';
 
+import ckBTC from '../../assets/ckBTC.png';
+import ckETH from '../../assets/ckETH.png';
+
 Modal.setAppElement('#root');
 
 const customStyles = {
@@ -146,8 +149,8 @@ function BorrowPopup({
             <div className={styles.IconContainer}>
               <span className={styles.Icon}>
                 <div>
-                  {!selectToken ? <img width={20} height={20} src="/frontend/assets/ckBTC.png" alt="" />
-                    : <img width={20} height={20} src="/frontend/assets/ckETH.png" alt="" />}
+                  {!selectToken ? <img width={20} height={20} src={ckBTC} alt="" />
+                    : <img width={20} height={20} src={ckETH} alt="" />}
                   <svg onClick={() => setShowSelectToken(!showSelectToken)} width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ cursor: 'pointer' }}>
                     <path fillRule="evenodd" clipRule="evenodd" d="M6.41438 9.53151C6.67313 9.20806 7.1451 9.15562 7.46855 9.41438L12 13.0396L16.5315 9.41438C16.855 9.15562 17.3269 9.20806 17.5857 9.53151C17.8444 9.85495 17.792 10.3269 17.4685 10.5857L12.4685 14.5857C12.1946 14.8048 11.8054 14.8048 11.5315 14.5857L6.53151 10.5857C6.20806 10.3269 6.15562 9.85495 6.41438 9.53151Z" fill="#858697" />
                   </svg>

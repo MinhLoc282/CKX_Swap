@@ -2,6 +2,10 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import styles from './index.module.css';
 
+import ckBTC from '../../assets/ckBTC.png';
+import ckETH from '../../assets/ckETH.png';
+import ICP from '../../assets/ICP.png';
+
 function PoolPage() {
   return (
     <div className={styles.PageContainer}>
@@ -16,11 +20,11 @@ function PoolPage() {
         <div className={styles.PoolCards}>
           <div className={styles.GridPools}>
             <div style={{ display: 'flex', gap: '10px' }}>
-              <img src="/frontend/assets/ckETH.png" width={36} alt="" />
+              <img src={ckETH} width={36} alt="" />
               <div style={{ alignSelf: 'center' }}>ckETH</div>
             </div>
             <div style={{ display: 'flex', gap: '10px' }}>
-              <img src="/frontend/assets/ckBTC.png" width={36} alt="" />
+              <img src={ckBTC} width={36} alt="" />
               <div style={{ alignSelf: 'center' }}>d.ckETH</div>
             </div>
           </div>
@@ -45,11 +49,11 @@ function PoolPage() {
         <div className={styles.PoolCards}>
           <div className={styles.GridPools}>
             <div style={{ display: 'flex', gap: '10px' }}>
-              <img src="/frontend/assets/ckETH.png" width={36} alt="" />
+              <img src={ckETH} width={36} alt="" />
               <div style={{ alignSelf: 'center' }}>ckETH</div>
             </div>
             <div style={{ display: 'flex', gap: '10px' }}>
-              <img src="/frontend/assets/ckBTC.png" width={36} alt="" />
+              <img src={ckBTC} width={36} alt="" />
               <div style={{ alignSelf: 'center' }}>ckBTC</div>
             </div>
           </div>
@@ -74,11 +78,11 @@ function PoolPage() {
         <div className={styles.PoolCards}>
           <div className={styles.GridPools}>
             <div style={{ display: 'flex', gap: '10px' }}>
-              <img src="/frontend/assets/ckETH.png" width={36} alt="" />
+              <img src={ckETH} width={36} alt="" />
               <div style={{ alignSelf: 'center' }}>ckETH</div>
             </div>
             <div style={{ display: 'flex', gap: '10px' }}>
-              <img src="/frontend/assets/ICP.png" width={36} alt="" />
+              <img src={ICP} width={36} alt="" />
               <div style={{ alignSelf: 'center' }}>ICP</div>
             </div>
           </div>
