@@ -8,6 +8,8 @@ import { createRequire } from 'node:module';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+const outputRoot = __dirname;
+
 const require = createRequire(import.meta.url);
 const dfxJson = require('./dfx.json');
 
@@ -32,17 +34,18 @@ const aliases = Object.entries(dfxJson.canisters).reduce(
   (acc, [name, _value]) => {
     // Get the network name, or `local` by default.
     const networkName = process.env.DFX_NETWORK ?? 'local';
-    const outputRoot = path.join(
-      __dirname,
+    const outputPath = path.join(
+      outputRoot,
       '.dfx',
       networkName,
       'canisters',
       name,
+      'index.js',
     );
 
     return {
       ...acc,
-      [`canisters/${name}`]: path.join(outputRoot, 'index' + '.js'),
+      [`canisters/${name}`]: outputPath,
     };
   },
   {},
