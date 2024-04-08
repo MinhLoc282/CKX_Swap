@@ -2,7 +2,12 @@ import { defineConfig } from 'vite';
 import reactRefresh from '@vitejs/plugin-react-refresh';
 import path from 'path';
 import fs from 'fs';
-import dfxJson from './dfx.json';
+
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
+
+const dfxJson = require('./dfx.json');
 
 const isDev = process.env.DFX_NETWORK !== 'ic';
 

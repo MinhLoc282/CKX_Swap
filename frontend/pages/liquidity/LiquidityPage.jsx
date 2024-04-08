@@ -6,12 +6,22 @@ import { useAuth } from '../../hooks/use-auth-client';
 import PairContainer from './pairContainer/PairContainer';
 
 import styles from './index.module.css';
+import AddTokenPopup from './popups/Deposit/AddTokenPopup';
 
 function LiquidityPage() {
   const { swapActor, principal } = useAuth();
 
   const [userPositions, setUserPositions] = useState([]);
   const [positionSymbols, setPositionSymbols] = useState([]);
+  const [isAddTokenModalOpen, setAddTokenModalOpen] = useState(false);
+
+  const openAddTokenModal = () => {
+    setAddTokenModalOpen(true);
+  };
+
+  const closeAddTokenModal = () => {
+    setAddTokenModalOpen(false);
+  };
 
   const handleShowInfoClick = () => {
 
@@ -19,10 +29,10 @@ function LiquidityPage() {
 
   const handleToSymbol = async (id) => {
     const tokens = id.split(':');
-    const token0 = await swapActor.symbol(tokens[0]);
-    const token1 = await swapActor.symbol(tokens[1]);
+    const token0res = await swapActor.symbol(tokens[0]);
+    const token1res = await swapActor.symbol(tokens[1]);
 
-    return `${token0}/${token1}`;
+    return `${token0res}/${token1res}`;
   };
 
   const calculateTotalValue = () => {
@@ -70,6 +80,10 @@ function LiquidityPage() {
             <Link to="/swap/liquidity/add">
               Add Liquidity
             </Link>
+
+            <button type="button" onClick={openAddTokenModal} className={styles.Btn}>
+              Transfer Token
+            </button>
           </div>
 
           <div className={styles.PositionOuterContainer}>
@@ -111,6 +125,11 @@ function LiquidityPage() {
           </div>
         </div>
       </div>
+
+      <AddTokenPopup
+        isOpen={isAddTokenModalOpen}
+        onClose={closeAddTokenModal}
+      />
     </div>
   );
 }
