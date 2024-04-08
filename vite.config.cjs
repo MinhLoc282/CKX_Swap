@@ -2,14 +2,9 @@ import { defineConfig } from 'vite';
 import reactRefresh from '@vitejs/plugin-react-refresh';
 import path from 'path';
 import fs from 'fs';
-import { createRequire } from 'node:module';
-
-const require = createRequire(import.meta.url);
-const dfxJson = require('./dfx.json');
+import dfxJson from './dfx.json' assert { type: 'json' };
 
 const isDev = process.env.DFX_NETWORK !== 'ic';
-
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
 
 let canisterIds;
 try {
