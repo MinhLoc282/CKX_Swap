@@ -1,12 +1,9 @@
-import { defineConfig } from 'vite';
-import reactRefresh from '@vitejs/plugin-react-refresh';
-import path from 'path';
-import fs from 'fs';
+const { defineConfig } = require('vite');
+const reactRefresh = require('@vitejs/plugin-react-refresh');
+const path = require('path');
+const fs = require('fs');
 
-import { createRequire } from 'node:module';
-
-const require = createRequire(import.meta.url);
-
+// Import dfx.json using CommonJS require
 const dfxJson = require('./dfx.json');
 
 const isDev = process.env.DFX_NETWORK !== 'ic';
