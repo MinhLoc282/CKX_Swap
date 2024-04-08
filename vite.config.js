@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite';
 import reactRefresh from '@vitejs/plugin-react-refresh';
-import path from 'path';
+import path, { dirname } from 'path';
 import fs from 'fs';
 import { createRequire } from 'node:module';
 
@@ -29,7 +29,7 @@ const aliases = Object.entries(dfxJson.canisters).reduce(
     // Get the network name, or `local` by default.
     const networkName = process.env.DFX_NETWORK ?? 'local';
     const outputRoot = path.join(
-      __dirname,
+      dirname,
       '.dfx',
       networkName,
       'canisters',
