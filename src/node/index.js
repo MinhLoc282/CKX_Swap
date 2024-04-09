@@ -26,7 +26,7 @@ const effectiveCanisterId = canisterId?.toString()
 
 const agent = new HttpAgent({
   identity,
-  host: 'http://',
+  host: 'https://ic0.app/',
   fetch,
 });
 
