@@ -14,7 +14,7 @@ import { useAuth } from '../../../../hooks/use-auth-client';
 // import * as token0 from '../../../../../src/declarations/token0';
 import * as deposit from '../../../../../src/declarations/deposit';
 
-import dckETH from '../../../../assets/d.ckETH.png';
+import dckETH from '../../../../assets/d.cketh.png';
 import ckETH from '../../../../assets/ckETH.png';
 
 Modal.setAppElement('#root');

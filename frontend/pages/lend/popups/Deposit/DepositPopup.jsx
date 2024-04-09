@@ -12,7 +12,7 @@ import * as deposit from '../../../../../src/declarations/deposit';
 import * as token0 from '../../../../../src/declarations/token0';
 
 import ckETH from '../../../../assets/ckETH.png';
-import dckETH from '../../../../assets/d.ckETH.png';
+import dckETH from '../../../../assets/d.cketh.png';
 
 Modal.setAppElement('#root');
 

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styles from './index.module.css';
 
 import ckBTC from '../../assets/d.ckBTC.png';
-import ckETH from '../../assets/d.ckETH.png';
+import ckETH from '../../assets/d.cketh.png';
 
 function BottomLend(
   { switchPage },

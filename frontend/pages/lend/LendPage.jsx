@@ -10,7 +10,7 @@ import { useAuth } from '../../hooks/use-auth-client';
 import ckBTC from '../../assets/ckBTC.png';
 import ckETH from '../../assets/ckETH.png';
 import dckBTC from '../../assets/d.ckBTC.png';
-import dckETH from '../../assets/d.ckETH.png';
+import dckETH from '../../assets/d.cketh.png';
 
 function LendPage() {
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
