@@ -20,7 +20,8 @@ if (isDev) {
 }
 
 // Use `process.env` if available provoded, or fall back to local
-const effectiveCanisterId = canisterId?.toString() ?? localCanisterIds.borrow.local;
+const effectiveCanisterId = canisterId?.toString()
+?? (isDev ? localCanisterIds.borrow.local : localCanisterIds.borrow.ic);
 // const effectiveCanisterId = 'be2us-64aaa-aaaaa-qaabq-cai';
 
 const agent = new HttpAgent({
