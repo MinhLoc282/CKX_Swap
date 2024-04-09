@@ -83,7 +83,7 @@ async function main() {
     // const update = await actor.updateA();
     // const mintResult1 = await actor.valueA();
     // const mintResult = await actor.user();
-  }, [15000]);
+  }, [60000]);
 }
 
 main();
