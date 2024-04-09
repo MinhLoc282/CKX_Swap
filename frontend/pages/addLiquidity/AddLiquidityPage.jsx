@@ -16,7 +16,9 @@ import styles from './index.module.css';
 import AddLiquidityModal from './AddLiquidityModal/AddLiquidityModal';
 
 function AddLiquidityPage() {
-  const { swapActor, principal } = useAuth();
+  const {
+    swapActor, principal, token0Actor, token1Actor,
+  } = useAuth();
   const navigation = useNavigate();
   const validation = useFormik({
     initialValues: {
@@ -184,17 +186,24 @@ function AddLiquidityPage() {
 
   useEffect(() => {
     const handleGetUserBalances = async () => {
-      const res = await swapActor.getUserBalances(principal);
-      const token0Balance = res.find((balance) => balance[0] === validation.values.token0);
-      const token1Balance = res.find((balance) => balance[0] === validation.values.token1);
+      const token0Balance = await token0Actor.icrc1_balance_of({
+        owner: principal,
+        subaccount: [],
+      });
+      const token1Balance = await token1Actor.icrc1_balance_of({
+        owner: principal,
+        subaccount: [],
+      });
 
-      setUserBalances([token0Balance[1], token1Balance[1]]);
+      setUserBalances([token0Balance, token1Balance]);
     };
 
-    if (swapActor && principal && validation.values.token0 && validation.values.token1) {
+    if (swapActor && principal && validation.values.token0
+      && validation.values.token1 && token0Actor && token1Actor) {
       handleGetUserBalances();
     }
-  }, [swapActor, principal, validation.values.token0, validation.values.token1]);
+  }, [swapActor, principal, validation.values.token0, validation.values.token1,
+    token0Actor, token1Actor]);
 
   return (
     <div className={styles.PageContainer}>
