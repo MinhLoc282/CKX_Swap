@@ -11,6 +11,9 @@ import { useAuth } from '../../../../hooks/use-auth-client';
 import * as deposit from '../../../../../src/declarations/deposit';
 import * as token0 from '../../../../../src/declarations/token0';
 
+import ckETH from '../../../../assets/ckETH.png';
+import dckETH from '../../../../assets/d.ckETH.png';
+
 Modal.setAppElement('#root');
 
 const customStyles = {
@@ -172,7 +175,7 @@ function DepositPopup({
         <div className={styles.InputContainer}>
           <div className={styles.InputGroup}>
             <div className={styles.IconContainer}>
-              <span className={styles.Icon}><img width={18} height={18} src="frontend/assets/ckETH.png" alt="" /></span>
+              <span className={styles.Icon}><img width={18} height={18} src={ckETH} alt="" /></span>
             </div>
             <input
               type="number"
@@ -264,7 +267,7 @@ function DepositPopup({
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px' }}>
         <div style={{ color: 'rgba(133, 134, 151, 1)', fontWeight: 400 }}>Amount of d.ckETH recieved</div>
         <div style={{ display: 'flex' }}>
-          <img width={18} height={18} src="frontend/assets/d.ckETH.png" alt="" />
+          <img width={18} height={18} src={dckETH} alt="" />
           {amountInput && amountReceived(selectedOption) && <div style={{ marginLeft: '8px' }}>{Math.round(amountInput * (amountReceived(selectedOption)) * 1000) / 1000}</div>}
         </div>
       </div>

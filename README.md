@@ -39,7 +39,7 @@ dfx build
       initial_balances = vec {
           record {
               record {
-                  owner = principal "nhiuj-uow5k-5ngvy-3cley-gf72c-vkjn2-2xuky-fxfsp-wy4uo-3eroo-fae";
+                  owner = principal "ln6uo-kltso-5nnoy-vpx3t-5gssy-m4ub5-bk4op-tiey6-ceb65-jklgn-4ae";
                   subaccount = null;
                   };
               1000_000_000_000_000_000_000
@@ -59,7 +59,7 @@ dfx build
       initial_balances = vec {
           record {
               record {
-                  owner = principal "nhiuj-uow5k-5ngvy-3cley-gf72c-vkjn2-2xuky-fxfsp-wy4uo-3eroo-fae";
+                  owner = principal "ln6uo-kltso-5nnoy-vpx3t-5gssy-m4ub5-bk4op-tiey6-ceb65-jklgn-4ae";
                   subaccount = null;
               };
               1000_000_000_000_000_000_000

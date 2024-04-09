@@ -1,5 +1,23 @@
 {
+  "aggregator": {
+    "ic": "wrasa-hiaaa-aaaap-qheuq-cai"
+  },
+  "assets": {
+    "ic": "wydz4-raaaa-aaaap-qheva-cai"
+  },
+  "borrow": {
+    "ic": "w7c7i-4yaaa-aaaap-qhevq-cai"
+  },
+  "deposit": {
+    "ic": "wkfof-5qaaa-aaaap-qhewa-cai"
+  },
   "swap": {
-    "ic": "3xwpq-ziaaa-aaaah-qcn4a-cai"
+    "ic": "wneir-qiaaa-aaaap-qhewq-cai"
+  },
+  "token0": {
+    "ic": "x3pq2-fyaaa-aaaap-qhetq-cai"
+  },
+  "token1": {
+    "ic": "wwbuu-kqaaa-aaaap-qheua-cai"
   }
 }

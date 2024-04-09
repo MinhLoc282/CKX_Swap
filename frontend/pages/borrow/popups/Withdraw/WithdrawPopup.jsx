@@ -10,8 +10,8 @@ import styles from './index.module.css';
 import { useAuth } from '../../../../hooks/use-auth-client';
 
 // import * as borrow from '../../../../../src/declarations/borrow';
-import ckBTC from '../../assets/ckBTC.png';
-import ckETH from '../../assets/ckETH.png';
+import ckBTC from '../../../../assets/ckBTC.png';
+import ckETH from '../../../../assets/ckETH.png';
 
 Modal.setAppElement('#root');
 
@@ -116,7 +116,7 @@ function WithdrawPopup({
           <div className={styles.InputGroup}>
             <div className={styles.IconContainer}>
               <span className={styles.Icon}>
-                {/* <img width={20} height={20} src="/frontend/assets/ckETH.png" alt="" /> */}
+                {/* <img width={20} height={20} src={ckETH} alt="" /> */}
                 <img width={20} height={20} src={ckBTC} alt="" />
                 <div style={{ marginTop: '-3px', color: '#858697', fontWeight: 500 }}>{'<>'}</div>
                 <img width={20} height={20} src={ckETH} alt="" />

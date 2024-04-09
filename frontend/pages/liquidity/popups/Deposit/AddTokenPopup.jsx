@@ -18,7 +18,7 @@ const customStyles = {
     color: 'white',
     background: 'linear-gradient(0deg, #1C1D26, #1C1D26), linear-gradient(0deg, #2C2D3B, #2C2D3B)',
     width: '444px',
-    height: '306px',
+    height: '356px',
     top: '50%',
     left: '50%',
     right: 'auto',
@@ -47,6 +47,7 @@ function AddTokenPopup({
   const [decimals, setDecimals] = useState(0);
   const [amountInput, setAmountInput] = useState();
   const [tokenPrincipal, setTokenPrincipal] = useState('');
+  const [transferPrincipal, setTransferPrincipal] = useState('');
 
   const closeModal = () => {
     onClose();
@@ -62,16 +63,15 @@ function AddTokenPopup({
 
     try {
       setLoading(true);
-      await swapActor.addToken(Principal.fromText(tokenPrincipal), 'ICRC1');
       if (tokenPrincipal && principal) {
         if (tokenPrincipal === token0.canisterId) {
           await token0Actor.icrc1_transfer({
-            to: Principal.fromText(tokenPrincipal),
+            to: Principal.fromText(transferPrincipal),
             amount: amountInput,
           });
         } else if (tokenPrincipal === token1.canisterId) {
           await token1Actor.icrc1_balance_of({
-            to: Principal.fromText(tokenPrincipal),
+            to: Principal.fromText(transferPrincipal),
             amount: amountInput,
           });
         }
@@ -97,6 +97,7 @@ function AddTokenPopup({
     const handleGetSupportedTokenList = async () => {
       const res = await swapActor.getSupportedTokenList();
       setTokenList(res);
+      setTokenPrincipal(res[0].id);
     };
 
     if (swapActor) {
@@ -113,17 +114,18 @@ function AddTokenPopup({
 
           if (tokenPrincipal === token0.canisterId) {
             balance = await token0Actor.icrc1_balance_of({
-              owner: Principal.fromText(tokenPrincipal),
+              owner: principal,
               subaccount: [],
             });
             dec = await token0Actor.icrc1_decimals();
           } else if (tokenPrincipal === token1.canisterId) {
             balance = await token1Actor.icrc1_balance_of({
-              owner: Principal.fromText(tokenPrincipal),
+              owner: principal,
               subaccount: [],
             });
             dec = await token1Actor.icrc1_decimals();
           }
+
           setTokenBalance(Number(balance));
           setDecimals(Number(dec));
         } catch (error) {
@@ -190,6 +192,16 @@ function AddTokenPopup({
             <button type="button" className={styles.MaxButton} onClick={setMaxInput}>
               Max
             </button>
+          </div>
+
+          <div className={styles.InputGroup}>
+            <input
+              type="text"
+              className={styles.InputFieldPrincipal}
+              placeholder="Enter principal to transfer to"
+              onChange={(e) => setTransferPrincipal(e.target.value)}
+              value={transferPrincipal}
+            />
           </div>
         </div>
       </div>

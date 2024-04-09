@@ -13,8 +13,8 @@ import { useAuth } from '../../../../hooks/use-auth-client';
 import * as token0 from '../../../../../src/declarations/token0';
 import * as token1 from '../../../../../src/declarations/token1';
 
-import ckBTC from '../../assets/ckBTC.png';
-import ckETH from '../../assets/ckETH.png';
+import ckBTC from '../../../../assets/ckBTC.png';
+import ckETH from '../../../../assets/ckETH.png';
 
 Modal.setAppElement('#root');
 

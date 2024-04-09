@@ -14,6 +14,9 @@ import { useAuth } from '../../../../hooks/use-auth-client';
 // import * as token0 from '../../../../../src/declarations/token0';
 import * as deposit from '../../../../../src/declarations/deposit';
 
+import dckETH from '../../../../assets/d.ckETH.png';
+import ckETH from '../../../../assets/ckETH.png';
+
 Modal.setAppElement('#root');
 
 const customStyles = {
@@ -279,7 +282,7 @@ function WithdrawPopup({
               <div style={{ color: 'rgba(133, 134, 151, 1)' }}>UNLOCKED</div>
             </div>
             <div style={{ display: 'flex' }}>
-              <img style={{ marginRight: '4px' }} src="frontend/assets/ckETH.png" width={18} height={18} alt="" />
+              <img style={{ marginRight: '4px' }} src={ckETH} width={18} height={18} alt="" />
               <div style={{ color: 'rgba(204, 204, 204, 1)', fontSize: '18px', fontWeight: 500 }}>
                 96.72
               </div>
@@ -296,7 +299,7 @@ function WithdrawPopup({
               <div style={{ color: 'rgba(133, 134, 151, 1)' }}>LOCKED</div>
             </div>
             <div style={{ display: 'flex' }}>
-              <img style={{ marginRight: '4px' }} src="frontend/assets/ckETH.png" width={18} height={18} alt="" />
+              <img style={{ marginRight: '4px' }} src={ckETH} width={18} height={18} alt="" />
               <div style={{ color: 'rgba(204, 204, 204, 1)', fontSize: '18px', fontWeight: 500 }}>
                 96.72
               </div>
@@ -313,7 +316,7 @@ function WithdrawPopup({
               <div style={{ color: 'rgba(133, 134, 151, 1)' }}>BALANCE</div>
             </div>
             <div style={{ display: 'flex' }}>
-              <img style={{ marginRight: '4px' }} src="frontend/assets/d.ckETH.png" width={18} height={18} alt="" />
+              <img style={{ marginRight: '4px' }} src={dckETH} width={18} height={18} alt="" />
               <div style={{ color: 'rgba(204, 204, 204, 1)', fontSize: '18px', fontWeight: 500 }}>
                 {wrapBalance / 10 ** 18}
               </div>
@@ -423,7 +426,7 @@ function WithdrawPopup({
             <div className={styles.InputGroup}>
               <div className={styles.IconContainer}>
                 <span className={styles.Icon}>
-                  <img src="frontend/assets/ckETH.png" width={18} height={18} style={{ marginTop: '4px' }} alt="" />
+                  <img src={ckETH} width={18} height={18} style={{ marginTop: '4px' }} alt="" />
                 </span>
               </div>
               <input
@@ -478,7 +481,7 @@ function WithdrawPopup({
             <div className={styles.InputGroup}>
               <div className={styles.IconContainer}>
                 <span className={styles.Icon}>
-                  <img src="frontend/assets/ckETH.png" width={18} height={18} style={{ marginTop: '4px' }} alt="" />
+                  <img src={ckETH} width={18} height={18} style={{ marginTop: '4px' }} alt="" />
                 </span>
               </div>
               <input
@@ -533,7 +536,7 @@ function WithdrawPopup({
             <div className={styles.InputGroup}>
               <div className={styles.IconContainer}>
                 <span className={styles.Icon}>
-                  <img src="frontend/assets/ckETH.png" width={18} height={18} style={{ marginTop: '4px' }} alt="" />
+                  <img src={ckETH} width={18} height={18} style={{ marginTop: '4px' }} alt="" />
                 </span>
               </div>
               <input

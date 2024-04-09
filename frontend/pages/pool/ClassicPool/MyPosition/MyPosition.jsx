@@ -4,8 +4,8 @@ import {
 } from '../Utils';
 import styles from './index.module.css';
 
-import ckBTC from '../../assets/ckBTC.png';
-import ckETH from '../../assets/ckETH.png';
+import ckBTC from '../../../../assets/ckBTC.png';
+import ckETH from '../../../../assets/ckETH.png';
 
 function MyPosition() {
   return (

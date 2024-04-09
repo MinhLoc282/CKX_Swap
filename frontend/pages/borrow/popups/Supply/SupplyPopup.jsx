@@ -11,8 +11,8 @@ import { useAuth } from '../../../../hooks/use-auth-client';
 
 import * as borrow from '../../../../../src/declarations/borrow';
 
-import ckBTC from '../../assets/ckBTC.png';
-import ckETH from '../../assets/ckETH.png';
+import ckBTC from '../../../../assets/ckBTC.png';
+import ckETH from '../../../../assets/ckETH.png';
 
 Modal.setAppElement('#root');
 
