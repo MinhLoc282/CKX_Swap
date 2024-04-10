@@ -7,6 +7,8 @@ import * as Yup from 'yup';
 import { Principal } from '@dfinity/principal';
 
 import { useAuth } from '../../hooks/use-auth-client';
+import * as token0 from '../../../src/declarations/token0';
+import * as token1 from '../../../src/declarations/token1';
 
 import SelectTokenModal from './SelectTokenModal/SelectTokenModal';
 
@@ -17,7 +19,7 @@ import AddLiquidityModal from './AddLiquidityModal/AddLiquidityModal';
 
 function AddLiquidityPage() {
   const {
-    swapActor, principal, token0Actor, token1Actor,
+    swapActor, principal, token0Actor, token1Actor, identity,
   } = useAuth();
   const navigation = useNavigate();
   const validation = useFormik({
@@ -186,11 +188,23 @@ function AddLiquidityPage() {
 
   useEffect(() => {
     const handleGetUserBalances = async () => {
-      const token0Balance = await token0Actor.icrc1_balance_of({
+      const token0ActorForSelectedToken = token0.createActor(validation.values.token0, {
+        agentOptions: {
+          identity,
+        },
+      });
+
+      const token1ActorForSelectedToken = token1.createActor(validation.values.token1, {
+        agentOptions: {
+          identity,
+        },
+      });
+
+      const token0Balance = await token0ActorForSelectedToken.icrc1_balance_of({
         owner: principal,
         subaccount: [],
       });
-      const token1Balance = await token1Actor.icrc1_balance_of({
+      const token1Balance = await token1ActorForSelectedToken.icrc1_balance_of({
         owner: principal,
         subaccount: [],
       });
