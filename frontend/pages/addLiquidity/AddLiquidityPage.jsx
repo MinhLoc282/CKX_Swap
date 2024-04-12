@@ -268,7 +268,8 @@ function AddLiquidityPage() {
                 <p>
                   Balance:
                   {' '}
-                  {userBalances[0] ? Number(userBalances[0]) : 0}
+                  {userBalances[0]
+                    ? Math.round((Number(userBalances[0]) / 10 ** 18) * 1000) / 1000 : 0}
                 </p>
               </div>
 
@@ -293,7 +294,8 @@ function AddLiquidityPage() {
                 <p>
                   Balance:
                   {' '}
-                  {userBalances[1] ? Number(userBalances[1]) : 0}
+                  {userBalances[1]
+                    ? Math.round((Number(userBalances[1]) / 10 ** 18) * 1000) / 1000 : 0}
                 </p>
               </div>
             </div>

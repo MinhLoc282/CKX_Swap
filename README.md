@@ -14,7 +14,7 @@ dfx identity list
 dfx identity use default
 ##################################################
 
-dfx start --clean
+dfx start
 ### open new terminal
 # dfx deps pull
 # dfx deps init --argument '(null)' internet-identity
@@ -48,7 +48,7 @@ dfx build
       min_burn_amount = 0;
       minting_account = null;
       advanced_settings = null;
-  })'
+  })' --network ic --with-cycles 1000000000
 
   dfx deploy token1 --argument '( record {
       name = "Chain-key Ether";
@@ -68,25 +68,25 @@ dfx build
       min_burn_amount = 0;
       minting_account = null;
       advanced_settings = null;
-  })'
+  })' --network ic --with-cycles 1000000000
 
 ### Deploy swap canister and add authority for 2 token
-dfx deploy --network local swap --argument="(principal \"$(dfx identity get-principal)\", principal \"$(dfx canister --network local id swap)\")"
-dfx canister call swap addToken "(principal \"$(dfx canister id token0)\", \"ICRC1\")"
-dfx canister call swap addToken "(principal \"$(dfx canister id token1)\", \"ICRC1\")"
-dfx canister call swap createPair "(principal \"$(dfx canister id token0)\", principal \"$(dfx canister id token1)\")"
+dfx deploy --network ic swap --argument="(principal \"$(dfx identity get-principal)\", principal \"$(dfx canister --network ic id swap)\")"
+dfx canister call swap addToken "(principal \"$(dfx canister id token0 --network ic)\", \"ICRC1\")" --network ic
+dfx canister call swap addToken "(principal \"$(dfx canister id token1 --network ic)\", \"ICRC1\")" --network ic
+dfx canister call swap createPair "(principal \"$(dfx canister id token0 --network ic)\", principal \"$(dfx canister id token1 --network ic)\")" --network ic
 
 ### Deploy aggregator canister 
-dfx deploy --network local aggregator --argument="(principal \"$(dfx identity get-principal)\", principal \"$(dfx canister --network local id aggregator)\", \"$(dfx canister --network local id swap)\")"
+dfx deploy --network ic aggregator --argument="(principal \"$(dfx identity get-principal)\", principal \"$(dfx canister --network ic id aggregator)\", \"$(dfx canister --network ic id swap)\")"
 
 ### Deploy deposit (staking) canister and authority for 2 token
-dfx deploy --network local deposit --argument="(principal \"$(dfx identity get-principal)\", principal \"$(dfx canister --network local id deposit)\", \"d.ckETH'\", \"d.ckETH\", \"$(dfx canister --network local id token0)\")"
+dfx deploy --network ic deposit --argument="(principal \"$(dfx identity get-principal)\", principal \"$(dfx canister --network ic id deposit)\", \"d.ckETH'\", \"d.ckETH\", \"$(dfx canister --network ic id token0)\")"
 
-dfx canister call deposit addToken "(principal \"$(dfx canister id token0)\", \"ICRC2\")"
-dfx canister call deposit addToken "(principal \"$(dfx canister id token1)\", \"ICRC2\")"
+dfx canister call deposit addToken "(principal \"$(dfx canister --network ic id token0)\", \"ICRC2\")" --network ic
+dfx canister call deposit addToken "(principal \"$(dfx canister --network ic id token1)\", \"ICRC2\")" --network ic
 
 ### Deploy borrow canister
-dfx deploy --network local borrow --argument="(principal \"$(dfx identity get-principal)\", principal \"$(dfx canister --network local id aggregator)\", \"$(dfx canister --network local id swap)\", principal \"$(dfx canister --network local id token0)\", principal \"$(dfx canister --network local id token1)\")"
+dfx deploy --network ic borrow --argument="(principal \"$(dfx identity get-principal)\", principal \"$(dfx canister --network ic id aggregator)\", \"$(dfx canister --network ic id swap)\", principal \"$(dfx canister --network ic id token0)\", principal \"$(dfx canister --network ic id token1)\")"
 ```
 
 ### Step 3. Run UI
@@ -96,7 +96,7 @@ npm run dev
 
 ### Transfer token command
 ```bash
-dfx canister call token0 icrc1_transfer '(record {  to = record {owner=principal "bw4dl-smaaa-aaaaa-qaacq-cai"}; amount= 2_000_000_000_000_000_000 })'
+dfx canister call token0 icrc1_transfer '(record {  to = record {owner=principal "7whph-unbu7-lprhr-hrglu-fyio5-sxvvk-sn3aj-7bgkd-n5svt-uehkx-dqe"}; amount= 20_000_000_000_000_000_000 })'
 
 dfx canister call token1 icrc1_transfer '(record {  to = record {owner=principal "bw4dl-smaaa-aaaaa-qaacq-cai"}; amount= 2_000_000_000_000_000_000 })'
 ```

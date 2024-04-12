@@ -27,10 +27,10 @@ function Classic() {
             <OverviewIcon />
             <div>Overview</div>
           </div>
-          <div className={`${styles.buttonMenu} ${menu === 'MyPosition' && styles.selectedButton}`} onClick={() => setMenu('MyPosition')}>
+          {/* <div className={`${styles.buttonMenu} ${menu === 'MyPosition' && styles.selectedButton}`} onClick={() => setMenu('MyPosition')}>
             <MyPositionIcon />
             <div>My Position</div>
-          </div>
+          </div> */}
           <div className={`${styles.buttonMenu} ${menu === 'Deposit' && styles.selectedButton}`} onClick={() => setMenu('Deposit')}>
             <DepositIcon />
             <div>Deposit</div>

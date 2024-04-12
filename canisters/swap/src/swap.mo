@@ -28,6 +28,7 @@ import Hex "./Hex";
 import Bool "mo:base/Bool";
 import Error "mo:base/Error";
 import Account "./Account";
+import ICRC1 "./ICRC1";
 
 shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
     type Errors = {
@@ -475,7 +476,8 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
                     // subaccount = ?subaccount
                     subaccount = null
                 };
-                var balance = await icrc1TokenActor.icrc1_balance_of(depositSubAccount);
+                var token_canister = actor (Principal.toText(Principal.fromActor(icrc1TokenActor))) : ICRC1TokenActor;
+                var balance = await token_canister.icrc1_balance_of(depositSubAccount);
                 if (balance >= value +fee) {
                     var defaultSubaccount : Blob = Utils.defaultSubAccount();
                     var transferArg : TransferFromArgs = {
@@ -491,7 +493,7 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
                     };
                     // var txid = await icrc1TokenActor.icrc1_transfer(transferArg);
 
-                    var txid = await icrc1TokenActor.icrc2_transfer_from(transferArg);
+                    var txid = await token_canister.icrc2_transfer_from(transferArg);
                     switch (txid) {
                         case (#Ok(id)) { return #Ok(id) };
                         case (#Err(e)) { return #ICRCTransferError(e) }
@@ -826,7 +828,7 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
     // update token transfer fees,
     // e.g. tokenA's transfer fee is 1 when added to , in 's record the fee is 1,
     // later tokenA's transfer fee is changed to 2, if  is not up to date, will cause
-    //  to lose money when users withdraw tokenA from 
+    //  to lose money when users withdraw tokenA from
     public shared (msg) func updateTokenFees() : async Bool {
         assert (msg.caller == owner);
         for ((tokenId, info) in Iter.fromArray(tokens.getTokenInfoList())) {
@@ -1624,7 +1626,7 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
     //             amount1 := amount1D
     //         }
     //     };
-        
+
     //     if (amount0 > tokens.balanceOf(pair.token0, msg.caller)) {
     //         return #err("insufficient balance: " # pair.token0)
     //     };
@@ -1663,7 +1665,7 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
     //     if (feeOn) {
     //         pair.kLast := pair.reserve0 * pair.reserve1
     //     };
-        
+
     //     pair.totalSupply += lpAmount;
     //     pairs.put(pair.id, pair);
     //     ignore addRecord(
@@ -1684,11 +1686,11 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
     //     return #ok(txcounter - 1)
     // };
     public shared(msg) func addLiquidity(
-        token0: Principal, 
-        token1: Principal, 
-        amount0Desired: Nat, 
-        amount1Desired: Nat, 
-        amount0Min: Nat, 
+        token0: Principal,
+        token1: Principal,
+        amount0Desired: Nat,
+        amount1Desired: Nat,
+        amount0Min: Nat,
         amount1Min: Nat,
         deadline: Int
         ): async TxReceipt {
@@ -1771,7 +1773,7 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
         } else {
             lpAmount := Nat.min(amount0 * totalSupply_ / reserve0, amount1 * totalSupply_ / reserve1);
         };
-        
+
         processReward(tid0, tid1, totalSupply_);
         assert(lpAmount > 0);
         assert(lptokens.mint(pair.id, msg.caller, lpAmount));
@@ -1785,7 +1787,7 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
         pair.totalSupply += lpAmount;
         pairs.put(pair.id, pair);
         ignore addRecord(
-            msg.caller, "addLiquidity", 
+            msg.caller, "addLiquidity",
             [
                 ("pairId", #Text(pair.id)),
                 ("token0", #Text(pair.token0)),

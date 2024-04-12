@@ -6,7 +6,8 @@ import { useAuth } from '../../hooks/use-auth-client';
 import PairContainer from './pairContainer/PairContainer';
 
 import styles from './index.module.css';
-import AddTokenPopup from './popups/Deposit/AddTokenPopup';
+import AddTokenPopup from './popups/Transfer/TransferPopup';
+import DepositTokenPopup from './popups/Deposit/DepositTokenPopup';
 
 function LiquidityPage() {
   const { swapActor, principal } = useAuth();
@@ -14,6 +15,7 @@ function LiquidityPage() {
   const [userPositions, setUserPositions] = useState([]);
   const [positionSymbols, setPositionSymbols] = useState([]);
   const [isAddTokenModalOpen, setAddTokenModalOpen] = useState(false);
+  const [isDepositTokenModalOpen, setDepositTokenModalOpen] = useState(false);
 
   const openAddTokenModal = () => {
     setAddTokenModalOpen(true);
@@ -21,6 +23,14 @@ function LiquidityPage() {
 
   const closeAddTokenModal = () => {
     setAddTokenModalOpen(false);
+  };
+
+  const openDepositTokenModal = () => {
+    setDepositTokenModalOpen(true);
+  };
+
+  const closeDepositTokenModal = () => {
+    setDepositTokenModalOpen(false);
   };
 
   const handleShowInfoClick = () => {
@@ -84,6 +94,10 @@ function LiquidityPage() {
             <button type="button" onClick={openAddTokenModal} className={styles.Btn}>
               Transfer Token
             </button>
+
+            <button type="button" onClick={openDepositTokenModal} className={styles.Btn}>
+              Deposit Token
+            </button>
           </div>
 
           <div className={styles.PositionOuterContainer}>
@@ -129,6 +143,11 @@ function LiquidityPage() {
       <AddTokenPopup
         isOpen={isAddTokenModalOpen}
         onClose={closeAddTokenModal}
+      />
+
+      <DepositTokenPopup
+        isOpen={isDepositTokenModalOpen}
+        onClose={closeDepositTokenModal}
       />
     </div>
   );

@@ -17,7 +17,7 @@ function PoolPage() {
           <div className={styles.GridLiquidity}>Liquidity</div>
           <div className={styles.GridAPR}>APR</div>
         </div>
-        <div className={styles.PoolCards}>
+        {/* <div className={styles.PoolCards}>
           <div className={styles.GridPools}>
             <div style={{ display: 'flex', gap: '10px' }}>
               <img src={ckETH} width={36} alt="" />
@@ -45,7 +45,7 @@ function PoolPage() {
               </Link>
             </div>
           </div>
-        </div>
+        </div> */}
         <div className={styles.PoolCards}>
           <div className={styles.GridPools}>
             <div style={{ display: 'flex', gap: '10px' }}>
@@ -59,8 +59,9 @@ function PoolPage() {
           </div>
           <div className={styles.GridType}>
             <div style={{ display: 'flex', gap: '10px', marginTop: '4px' }}>
-              <Stable />
-              <div style={{ color: 'rgba(172, 179, 249, 1)', alignSelf: 'center' }}>Stable</div>
+              {/* <Stable /> */}
+              <Classic />
+              <div style={{ color: 'rgba(172, 179, 249, 1)', alignSelf: 'center' }}>Classic</div>
             </div>
           </div>
           <div className={styles.GridLiquidity}>
@@ -75,7 +76,7 @@ function PoolPage() {
             </div>
           </div>
         </div>
-        <div className={styles.PoolCards}>
+        {/* <div className={styles.PoolCards}>
           <div className={styles.GridPools}>
             <div style={{ display: 'flex', gap: '10px' }}>
               <img src={ckETH} width={36} alt="" />
@@ -103,7 +104,7 @@ function PoolPage() {
               </Link>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

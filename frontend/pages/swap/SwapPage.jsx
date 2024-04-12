@@ -216,7 +216,7 @@ function SwapPage() {
 
   const changeAmountIn = (percentage) => {
     if (userBalanceToken0[0]) {
-      const newAmountIn = (percentage * Number(userBalanceToken0[0])) / 100;
+      const newAmountIn = (percentage * (Number(userBalanceToken0[0]) / 10 ** 18)) / 100;
       validation.setFieldValue('amountIn', Math.floor(newAmountIn));
       setQuickInputAmountIn(percentage);
     }

@@ -6,7 +6,6 @@ import PropTypes from 'prop-types';
 
 import { Principal } from '@dfinity/principal';
 import { useAuth } from '../../../hooks/use-auth-client';
-import * as swap from '../../../../src/declarations/swap';
 
 // import * as swap from '../../../../src/declarations/swap';
 import { getAmountOutMin } from '../../../utils';
@@ -38,7 +37,7 @@ function SwapModal({
   clearAll,
 }) {
   const {
-    principal, swapActor, token0Actor,
+    principal, swapActor,
   } = useAuth();
 
   const [tokens, setTokens] = useState([]);

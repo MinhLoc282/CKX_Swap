@@ -1,4 +1,6 @@
-import React from 'react';
+/* eslint-disable no-nested-ternary */
+import React, { useEffect, useState } from 'react';
+import { Principal } from '@dfinity/principal';
 import {
   ClassicPool1, ClassicPool2, CopyButton,
   FiftyPercent, FeeAPR, RewardAPR,
@@ -9,8 +11,30 @@ import styles from './index.module.css';
 
 import ckBTC from '../../../../assets/ckBTC.png';
 import ckETH from '../../../../assets/ckETH.png';
+import { useAuth } from '../../../../hooks/use-auth-client';
+import * as token0 from '../../../../../src/declarations/token0';
+import * as token1 from '../../../../../src/declarations/token1';
 
 function Overview() {
+  const { swapActor } = useAuth();
+  const [pairInfo, setPairInfo] = useState(null);
+
+  useEffect(() => {
+    const fetchPairInfo = async () => {
+      try {
+        const pair = await swapActor
+          .getPair(Principal.fromText(token0.canisterId), Principal.fromText(token1.canisterId));
+        setPairInfo(pair[0]);
+      } catch (error) {
+        console.error('Error fetching pair info:', error);
+      }
+    };
+
+    if (swapActor) {
+      fetchPairInfo();
+    }
+  }, [swapActor]);
+
   return (
     <div>
       <div className={styles.RightHeader}>
@@ -21,7 +45,8 @@ function Overview() {
       <div className={styles.RightContract}>
         <div className={styles.RightTitle}>CONTRACT</div>
         <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
-          <div style={{ marginTop: '4px' }}>0x80115с...47c05c</div>
+          {/* <div style={{ marginTop: '4px' }}>0x80115с...47c05c</div> */}
+          <div style={{ marginTop: '4px' }}>{pairInfo ? pairInfo.id : '-'}</div>
           {' '}
           <div>
             <CopyButton />
@@ -30,7 +55,7 @@ function Overview() {
       </div>
       <div className={styles.RightRow}>
         <div className={styles.RightFirstRow}>
-          <div className={styles.RightFirstRowElement}>
+          {/* <div className={styles.RightFirstRowElement}>
             <div className={styles.RightTitle}>Current Exchange Rate</div>
             <div style={{ marginTop: '18px', display: 'flex', gap: '8px' }}>
               <img src={ckBTC} width={32} alt="" />
@@ -38,19 +63,67 @@ function Overview() {
               <img src={ckETH} width={32} alt="" />
               <div style={{ marginTop: '8px' }}>18 ckETH</div>
             </div>
+          </div> */}
+          <div className={styles.RightFirstRowElement}>
+            <div className={styles.RightTitle}>Current Exchange Rate</div>
+            {pairInfo && pairInfo.reserve0 > 0 && !pairInfo.reserve1 > 0 ? (
+              pairInfo.reserve1 > pairInfo.reserve0 ? (
+                <div style={{ marginTop: '18px', display: 'flex', gap: '8px' }}>
+                  <img src={ckBTC} width={32} alt="" />
+                  <div style={{ marginTop: '8px' }}>
+                    1 ckBTC =
+                  </div>
+                  <img src={ckETH} width={32} alt="" />
+                  <div style={{ marginTop: '8px' }}>
+                    {pairInfo.reserve1 / pairInfo.reserve0}
+                    {' '}
+                    ckETH
+                  </div>
+                </div>
+              ) : (
+                <div style={{ marginTop: '18px', display: 'flex', gap: '8px' }}>
+                  <img src={ckETH} width={32} alt="" />
+                  <div style={{ marginTop: '8px' }}>
+                    {pairInfo.reserve0 / pairInfo.reserve1}
+                    {' '}
+                    ckBTC =
+                  </div>
+                  <img src={ckBTC} width={32} alt="" />
+                  <div style={{ marginTop: '8px' }}>
+                    1 ckETH
+                  </div>
+                </div>
+              )
+            ) : (
+              <div style={{ marginTop: '18px', display: 'flex', gap: '8px' }}>
+                <img src={ckBTC} width={32} alt="" />
+                <div style={{ marginTop: '8px' }}>0 ckBTC =</div>
+                <img src={ckETH} width={32} alt="" />
+                <div style={{ marginTop: '8px' }}>0 ckETH</div>
+              </div>
+            )}
           </div>
+
           <div className={styles.RightFirstRowElement}>
             <div className={styles.RightTitle}>Assets in Pool</div>
             <div style={{ marginTop: '18px' }}>
               <div style={{ display: 'flex', gap: '10px' }}>
                 <FiftyPercent />
                 <img src={ckBTC} width={24} height={24} alt="" />
-                <div style={{ alignSelf: 'center' }}>17,003,450.69 USDC</div>
+                <div style={{ alignSelf: 'center' }}>
+                  {pairInfo ? Number(pairInfo.reserve0) : '-'}
+                  {' '}
+                  BTC
+                </div>
               </div>
               <div style={{ display: 'flex', gap: '10px', marginTop: '12px' }}>
                 <FiftyPercent />
                 <img src={ckETH} width={24} height={24} alt="" />
-                <div style={{ alignSelf: 'center' }}>17,003,450.69 USDC</div>
+                <div style={{ alignSelf: 'center' }}>
+                  {pairInfo ? Number(pairInfo.reserve1) : '-'}
+                  {' '}
+                  ETH
+                </div>
               </div>
             </div>
           </div>
