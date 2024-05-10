@@ -125,8 +125,10 @@ function AddTokenPopup({
         spender: { owner: Principal.fromText(swap.canisterId), subaccount: [] },
       });
       setIsTokenApproved(allowance.allowance >= amountInput * 10 ** 18);
+      setLoading(false);
     } catch (e) {
       console.error('Error during allowance:', e);
+      setLoading(false);
     }
   };
 
@@ -145,6 +147,7 @@ function AddTokenPopup({
 
       // Check results
       toast.success('Deposit successfully');
+      setAmountInput(0);
     } catch (e) {
       console.log(e);
       toast.error('Deposit error');

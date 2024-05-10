@@ -256,11 +256,9 @@ function AddLiquidityPage() {
                   type="number"
                   id="amount0Desired"
                   name="amount0Desired"
-                  placeholder="0.0"
                   onChange={validation.handleChange}
                   onBlur={validation.handleBlur}
                   value={validation.values.amount0Desired || 0}
-                  disabled={!bothTokensSelected}
                 />
                 {validation.touched.amount0Desired && validation.errors.amount0Desired && (
                 <div>{validation.errors.amount0Desired}</div>
@@ -282,7 +280,6 @@ function AddLiquidityPage() {
                   type="number"
                   id="amount1Desired"
                   name="amount1Desired"
-                  placeholder="0.0"
                   onChange={validation.handleChange}
                   onBlur={validation.handleBlur}
                   value={validation.values.amount1Desired || 0}
@@ -307,7 +304,7 @@ function AddLiquidityPage() {
               <p>
                 Current Price:
                 {' '}
-                {Math.round(price * 1000) / 1000}
+                {(price || 0).toFixed(6)}
                 {' '}
                 <span>
                   {selectedToken1Name || '--'}
@@ -321,7 +318,7 @@ function AddLiquidityPage() {
                 type="number"
                 name="minPrice"
                 placeholder="Min Price"
-                value={Math.round(priceMin * 1000) / 1000 || 0}
+                value={(priceMin || 0).toFixed(6)}
                 onChange={(e) => setPriceMin(parseFloat(e.target.value))}
                 disabled={!bothTokensSelected}
               />
@@ -330,7 +327,7 @@ function AddLiquidityPage() {
                 type="number"
                 name="maxPrice"
                 placeholder="Max Price"
-                value={Math.round(priceMax * 1000) / 1000 || 0}
+                value={(priceMax || 0).toFixed(6)}
                 onChange={(e) => setPriceMax(parseFloat(e.target.value))}
                 disabled={!bothTokensSelected}
               />

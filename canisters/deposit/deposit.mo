@@ -127,6 +127,7 @@ shared (msg) actor class Deposit(
 
     private stable var feeTo : Principal = owner_;
     private var depositTransactions = HashMap.HashMap<Principal, DepositSubAccounts>(1, Principal.equal, Principal.hash);
+    private var rewardDepositInfo = HashMap.HashMap<Principal, [DepositType]>(1, Principal.equal, Principal.hash);
     private stable var depositTransactionsEntries : [(Principal, DepositSubAccounts)] = [];
     private var tokens : Tokens.Tokens = Tokens.Tokens(feeTo, []);
     private stable let depositCounterV2 : Nat = 10000;
@@ -469,6 +470,22 @@ shared (msg) actor class Deposit(
         depositInfoCkETH.put(userPId, updateInform)
     };
 
+    private func updateArrayForRewawrd(userPId : Principal, newValue : Nat, newDepInform : DepositType) : () {
+        let maybeArray = rewardDepositInfo.get(userPId);
+        var updateInform : [DepositType] = [];
+
+        switch (maybeArray) {
+            case (?r) {
+                for (depEle in r.vals()) {
+                    updateInform := Array.append(updateInform, [depEle])
+                }
+            };
+            case (_) {}
+        };
+        updateInform := Array.append(updateInform, [newDepInform]);
+        depositInfoCkETH.put(userPId, updateInform)
+    };
+
     public shared (msg) func deposit(tokenId : Principal, value : Nat, duration : Nat) : async TxReceipt {
         if (value < 10000) {
             return #err("Value too small")
@@ -582,11 +599,84 @@ shared (msg) actor class Deposit(
     // private var nanosecondsPerDay : Time.Time = 24 * 60 * 60 * 1_000_000_000;
     private var nanosecondsPerDay : Time.Time = 60 * 1_000_000_000;
     var depositID = HashMap.HashMap<Principal, Nat>(10, Principal.equal, Principal.hash);
+    var depositRewardId = HashMap.HashMap<Principal, Nat>(10, Principal.equal, Principal.hash);
     // var isProcessing = HashMap.HashMap<Principal, [Nat]>(1, Principal.equal, Principal.hash);
 
     type InnerMap = HashMap.HashMap<Nat, Bool>;
     type OuterMap = HashMap.HashMap<Principal, InnerMap>;
     let isProcessing : OuterMap = HashMap.HashMap<Principal, InnerMap>(1, Principal.equal, Principal.hash);
+
+    public shared (msg) func depositReward(tokenId : Principal, value : Nat, duration : Nat) : async TxReceipt {
+      if (value < 10000) {
+            return #err("Value too small")
+        };
+        let tid : Text = Principal.toText(tokenId);
+
+        if (tokens.hasToken(tid) == false) return #err("token not exist");
+
+        let tokenCanister = _getTokenActor(tid);
+        let result = await _transferFrom(tokenCanister, msg.caller, value, tokens.getFee(tid));
+        let txid = switch (result) {
+            case (#Ok(id)) { id };
+            case (#Err(e)) { return #err("token transfer failed:" # tid) };
+            case (#ICRCTransferError(e)) {
+                switch (e) {
+                    case (#BadBurn) { return #err("BadBurn") };
+                    case (#BadFee) { return #err("BadFee") };
+                    case (#CreatedInFuture) { return #err("CreatedInFuture") };
+                    case (#CustomError(text)) {
+                        return #err("CustomError: " # text)
+                    };
+                    case (#Duplicate) { return #err("Duplicate") };
+                    case (#Expired) { return #err("Expired") };
+                    case (#GenericError) { return #err("GenericError") };
+                    case (#InsufficientAllowance) {
+                        return #err("InsufficientAllowance")
+                    };
+                    case (#InsufficientFunds) {
+                        return #err("InsufficientFunds")
+                    };
+                    case (#TemporarilyUnavailable) {
+                        return #err("TemporarilyUnavailable")
+                    };
+                    case (#TooOld) { return #err("TooOld") }
+                }
+            }
+        };
+        if (value < tokens.getFee(tid)) return #err("value less than token transfer fee");
+        ignore tokens.mint(tid, msg.caller, effectiveDepositAmount(tid, value));
+
+        var firstNum = getFirstMultiplier(value, duration);
+        var maybeId = depositRewardId.get(msg.caller);
+        var id = 0;
+        switch (maybeId) {
+            case (?r) {
+                id := r;
+                depositRewardId.put(msg.caller, id +1)
+            };
+            case (_) {
+                id := 0;
+                depositRewardId.put(msg.caller, id +1)
+            }
+        };
+        var newDepInform : DepositType = {
+            amount = value;
+            firstMultiplier = firstNum;
+            duration = duration;
+            startTime = Time.now();
+            id = id;
+            lastUpdateTime = 0;
+            isActive = true
+        };
+
+        updateArrayForRewawrd(msg.caller, value, newDepInform);
+
+        txcounter += 1;
+        return #ok(txcounter - 1)
+      // khi dc deposit vao nhan % reward tu swap sang borrow
+      // total balance d.ckbtc at the moment
+      // luu tien da dc deposit, timestamp luc deposit, check phai nhan duoc tien deposit roi
+    };
 
     public shared (msg) func withdrawInterest(index : Nat) : async ICRC1.TransferResult {
 
@@ -780,8 +870,61 @@ shared (msg) actor class Deposit(
 
     public shared (msg) func withdrawInterestAll() : async ICRC1.TransferResult {
         var maybeArray = depositInfoCkETH.get(msg.caller);
+        var rewards : [DepositType] = [];
+        for ((caller, rewardList) in rewardDepositInfo.entries()) {
+            for (reward in rewardList.vals()) {
+              rewards := Array.append(rewards, [reward])
+            }
+        };
+
+        Debug.print(debug_show(rewards));
 
         var totalWithdraw : Nat = 0;
+        for (reward in rewards.vals()) {
+            // Calculate interest based on the RewardDepositInfo structure
+            var t1 = reward.startTime + reward.lastUpdateTime * 24 * 60 * 60 * 1_000_000_000;
+            var t2 = Time.now();
+            var firstMultiplier = getFirstMultiplier(reward.amount, reward.duration);
+            var decayPerDay = await getDecayPerDay(reward);
+            var updateDay = compareTimestamps(t1, t2);
+            var currentInterest : Float = getInterest(t1, t2, firstMultiplier, decayPerDay, reward.duration, reward.lastUpdateTime, reward.isActive);
+
+            if (currentInterest > 0) {
+                var withdrawValue : Nat = Nat64.toNat(Int64.toNat64(Float.toInt64(Float.floor(currentInterest))));
+                totalWithdraw += withdrawValue;
+
+                if (updateDay > reward.duration) {
+                    updateDay := reward.duration
+                };
+
+                var newDepInform : DepositType = {
+                    id = reward.id;
+                    amount = reward.amount;
+                    duration = reward.duration;
+                    firstMultiplier = firstMultiplier;
+                    isActive = true;
+                    lastUpdateTime = updateDay; //updateDay
+                    startTime = reward.startTime
+                };
+
+                var arrTemp : DepositType = reward;
+                var updateInform : [DepositType] = [];
+                switch (maybeArray) {
+                    case (?r) {
+                        for (reward in r.vals()) {
+                            if (arrTemp == reward) {
+                                updateInform := Array.append(updateInform, [newDepInform])
+                            } else {
+                                updateInform := Array.append(updateInform, [reward])
+                            }
+                        }
+                    };
+                    case (_) {}
+                };
+                rewardDepositInfo.put(msg.caller, updateInform);
+            }
+        };
+
         switch (maybeArray) {
             case (?r) {
                 // let indices = Iter.range(0, r.size() -1);
@@ -1231,7 +1374,7 @@ shared (msg) actor class Deposit(
                 //     };
                 //     case (_) {}
                 // };
-                
+
                 // updateInform := Array.append(updateInform, [newDepInform]);
                 if (true) {
                     depositInfoCkETH.put(caller, updateInform)

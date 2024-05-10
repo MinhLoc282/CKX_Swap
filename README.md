@@ -96,7 +96,8 @@ npm run dev
 
 ### Transfer token command
 ```bash
-dfx canister call token0 icrc1_transfer '(record {  to = record {owner=principal "7whph-unbu7-lprhr-hrglu-fyio5-sxvvk-sn3aj-7bgkd-n5svt-uehkx-dqe"}; amount= 20_000_000_000_000_000_000 })'
+dfx canister call token0 icrc1_transfer '(record {  to = record {owner=principal "74jd6-uyaaa-aaaap-qhffq-cai"}; amount= 200_000_000_000_000_000_000 })' --network ic
 
-dfx canister call token1 icrc1_transfer '(record {  to = record {owner=principal "bw4dl-smaaa-aaaaa-qaacq-cai"}; amount= 2_000_000_000_000_000_000 })'
+dfx canister call token1 icrc1_transfer '(record {  to = record {owner=principal "74jd6-uyaaa-aaaap-qhffq-cai"}; amount= 200_000_000_000_000_000_000 })' --network ic
 ```
+

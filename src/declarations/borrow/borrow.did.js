@@ -2,6 +2,8 @@ export const idlFactory = ({ IDL }) => {
   const Time = IDL.Int;
   const DepositType = IDL.Record({
     'startTime' : Time,
+    'duration' : IDL.Nat,
+    'interest' : IDL.Nat,
     'isUsing' : IDL.Bool,
     'reserve0' : IDL.Nat,
     'reserve1' : IDL.Nat,
@@ -15,7 +17,7 @@ export const idlFactory = ({ IDL }) => {
   const Balance = IDL.Nat;
   const TxReceipt = IDL.Variant({ 'ok' : IDL.Nat, 'err' : IDL.Text });
   const Borrow = IDL.Service({
-    'borrow' : IDL.Func([IDL.Nat, IDL.Principal], [IDL.Text], []),
+    'borrow' : IDL.Func([IDL.Nat, IDL.Principal, IDL.Nat], [IDL.Text], []),
     'checkRemoveLP' : IDL.Func(
         [IDL.Vec(IDL.Principal)],
         [IDL.Vec(IDL.Nat)],

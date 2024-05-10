@@ -41,13 +41,14 @@
 }
 
 .Deposit{
+  box-sizing: border-box;
   border-radius: 12px;
   padding: 20px;
+  margin-top: 32px;
   display: flex;
   flex-direction: column;
-  gap: 32px;
   border: 1px solid rgba(44, 45, 59, 1);
-  width: 60%;
+  width: 70%;
 }
 
 .SelectContainer {
@@ -67,6 +68,7 @@
 }
 
 .Title {
+  color: #858697;
   font-family: Inter;
   font-size: 24px;
   font-weight: 500;
@@ -80,6 +82,15 @@
   font-size: 14px;
   font-weight: 400;
   line-height: 17px;
+  letter-spacing: 0em;
+  text-align: left;
+}
+
+.SubTitle2 {
+  color: #858697;
+  font-family: Inter;
+  font-size: 14px;
+  font-weight: 500;
   letter-spacing: 0em;
   text-align: left;
 }
@@ -124,6 +135,23 @@
 
 .Label svg {
   margin-left: 4px;
+}
+
+.quickInputButton {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.quickInputButton button{
+  margin-bottom: 8px;
+  width: 22%;
+  color: rgba(172, 179, 249, 1);
+  font-size: 16px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  border: 1px solid rgba(38, 39, 53, 1);
+  border-radius: 6px;
 }
 
 .CustomSelection {
@@ -221,6 +249,9 @@
   position: relative;
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  height: 24px;
+  margin-bottom: 12px;
 }
 
 .IconContainer {
@@ -228,6 +259,15 @@
   left: 16px;
   margin-top: 4px;
   z-index: 1;
+}
+
+.Icon {
+  font-weight: 600;
+  font-size: 18px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .InputField {
@@ -251,8 +291,10 @@
 
 .InputFieldDeposit {
   height: 60px;
-  padding: 16px;
-  padding-left: 100px;
+  padding-top: 16px;
+  padding-bottom: 16px;
+  padding-left: 0;
+  padding-right: 0;
   box-sizing: border-box;
   background-color: #1C1D26;
   border: 1px solid #2C2D3B;
@@ -373,5 +415,19 @@
 }
 
 .TransferButton {
-  margin-right: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 70%;
+  height: 48px;
+  margin-top: 30px;
+
+  background: linear-gradient(89.44deg, rgb(85, 105, 219) -0.31%, rgb(133, 114, 255) 91.14%);
+  font-weight: 500;
+  color: rgba(166, 173, 250, 1);
+  color: white;
+  text-decoration: none;
+
+  font-size: 18px;
 }

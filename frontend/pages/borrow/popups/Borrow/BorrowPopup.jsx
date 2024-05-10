@@ -23,7 +23,7 @@ const customStyles = {
     color: 'white',
     background: 'linear-gradient(0deg, #1C1D26, #1C1D26), linear-gradient(0deg, #2C2D3B, #2C2D3B)',
     width: '444px',
-    height: '472px',
+    height: '622px',
     top: '50%',
     left: '50%',
     right: 'auto',
@@ -51,15 +51,23 @@ function BorrowPopup({
   const [loading, setLoading] = useState(false);
   const [selectToken, setSelectToken] = useState(0);
   const [showSelectToken, setShowSelectToken] = useState(false);
+  const [dropDownDuration, setDropDownDuration] = useState(false);
+  const [selectedOption, setSelectedOption] = useState();
+
+  const handleSelect = (value) => {
+    setSelectedOption(value);
+    setDropDownDuration(false);
+  };
 
   const closeModal = () => {
     closeBorrowModal();
     setLoading(false);
     setAmountInput();
+    setSelectedOption();
   };
 
   const submitBorrow = async () => {
-    if (!amountInput) {
+    if (!amountInput || !selectedOption) {
       alert('Missing input');
     } else {
       try {
@@ -68,9 +76,11 @@ function BorrowPopup({
         if (!selectToken) {
           tokenCanister = token0.canisterId;
         }
+
         const tx = await borrowActor.borrow(
-          Number(amountInput) * 10 ** 18,
+          amountInput * 10 ** 18,
           Principal.fromText(tokenCanister),
+          Number(selectedOption),
         );
         console.log(tx);
 
@@ -193,6 +203,71 @@ function BorrowPopup({
           <button type="button" className={styles.SelectOption}>50%</button>
           <button type="button" className={styles.SelectOption}>75%</button>
           <button type="button" className={styles.SelectOption}>100%</button>
+        </div>
+      </div>
+
+      <div>
+        <div className={styles.LabelContainer}>
+          <div className={styles.Label}>
+            Borrow Duration (1 to 36 months)
+            <svg width="14" height="15" viewBox="0 0 14 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7.00008 5.1665V5.74984M7.00008 7.20817V9.83317M7.00008 13.3332C10.2217 13.3332 12.8334 10.7215 12.8334 7.49984C12.8334 4.27818 10.2217 1.6665 7.00008 1.6665C3.77842 1.6665 1.16675 4.27818 1.16675 7.49984C1.16675 10.7215 3.77842 13.3332 7.00008 13.3332Z" stroke="#858697" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+        </div>
+
+        <div className={styles.InputContainerDuration}>
+          <div className={styles.InputGroupDuration}>
+            <button
+              type="button"
+              className={styles.InputFieldDuration}
+              onClick={() => setDropDownDuration(!dropDownDuration)}
+            >
+              <div style={{ position: 'absolute', left: '48px' }}>
+                {selectedOption && (selectedOption <= 30 ? `${selectedOption} days` : `${selectedOption / 30} months`)}
+                {!selectedOption && ''}
+              </div>
+              <div>
+                <svg
+                  onClick={() => setDropDownDuration(!dropDownDuration)}
+                  width="18"
+                  height="18"
+                  viewBox="0 0 18 18"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M12.75 7.5L9 11.25L5.25 7.5" stroke="#646574" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+              <button
+                type="button"
+                className={styles.MaxButton}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleSelect(540);
+                }}
+              >
+                Max
+              </button>
+            </button>
+          </div>
+
+          {dropDownDuration
+            && (
+              <div className={styles.DropDownElements}>
+                <button onClick={() => handleSelect(1)} type="button"><p>1 day</p></button>
+                <button onClick={() => handleSelect(3)} type="button"><p>3 days</p></button>
+                <button onClick={() => handleSelect(7)} type="button"><p>7 days</p></button>
+                <button onClick={() => handleSelect(14)} type="button"><p>14 days</p></button>
+                <button onClick={() => handleSelect(30)} type="button"><p>1 month</p></button>
+                <button onClick={() => handleSelect(90)} type="button"><p>3 months</p></button>
+                <button onClick={() => handleSelect(180)} type="button"><p>6 months</p></button>
+                <button onClick={() => handleSelect(270)} type="button"><p>9 months</p></button>
+                <button onClick={() => handleSelect(360)} type="button"><p>12 months</p></button>
+                <button onClick={() => handleSelect(450)} type="button"><p>15 months</p></button>
+                <button onClick={() => handleSelect(540)} type="button"><p>18 months</p></button>
+              </div>
+            )}
         </div>
       </div>
 

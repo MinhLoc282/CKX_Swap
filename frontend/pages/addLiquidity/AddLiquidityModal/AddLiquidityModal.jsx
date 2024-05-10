@@ -38,7 +38,7 @@ function AddLiquidityModal({
 }) {
   const {
     swapActor, token0Actor, token1Actor,
-    aggregatorActor,
+    aggregatorActor, principal,
   } = useAuth();
 
   const [tokens, setTokens] = useState([]);
@@ -253,12 +253,20 @@ function AddLiquidityModal({
     try {
       setLoading(true);
       let res;
+      const t0b = await token0Actor.icrc1_balance_of({
+        owner: principal,
+        subaccount: [],
+      });
+      const t1b = await token0Actor.icrc1_balance_of({
+        owner: principal,
+        subaccount: [],
+      });
       const record = {
         fee: [],
         memo: [],
         from_subaccount: [],
         created_at_time: [],
-        amount: formValues.amount0Desired * 10 ** 18,
+        amount: t0b,
         expected_allowance: [],
         expires_at: [],
         spender: Principal.fromText(aggregator.canisterId),
@@ -268,7 +276,7 @@ function AddLiquidityModal({
         memo: [],
         from_subaccount: [],
         created_at_time: [],
-        amount: formValues.amount1Desired * 10 ** 18,
+        amount: t1b,
         expected_allowance: [],
         expires_at: [],
         spender: Principal.fromText(aggregator.canisterId),
@@ -289,6 +297,8 @@ function AddLiquidityModal({
           0,
           timestamp,
         );
+
+        console.log(res);
       } else {
         await token1Actor.icrc2_approve(record);
         await token0Actor.icrc2_approve(record1);
@@ -304,12 +314,14 @@ function AddLiquidityModal({
           0,
           timestamp,
         );
+
+        console.log(res);
       }
       setLoading(false);
 
       closeAddLiquidityModal();
 
-      if (res.includes('ok') || res.includes('Ok')) {
+      if (res.trim().toLowerCase() === 'ok') {
         toast.success('Liquidity added successfully');
       } else {
         console.log('RES: ', res);

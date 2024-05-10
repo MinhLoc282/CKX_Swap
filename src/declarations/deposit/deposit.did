@@ -165,6 +165,7 @@ type Deposit =
    balanceOf: (text, principal) -> (nat) query;
    burn: (BurnArgs) -> (TransferResult);
    deposit: (principal, nat, nat) -> (TxReceipt);
+   depositReward: (principal, nat, nat) -> (TxReceipt);
    deposit_cycles: () -> ();
    getCurrentMultiplier: (DepositType) -> (float64);
    getDepositId: (principal) -> (opt vec DepositType);

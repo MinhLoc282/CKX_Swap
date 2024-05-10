@@ -63,6 +63,7 @@ export interface Deposit {
   'balanceOf' : ActorMethod<[string, Principal], bigint>,
   'burn' : ActorMethod<[BurnArgs], TransferResult>,
   'deposit' : ActorMethod<[Principal, bigint, bigint], TxReceipt>,
+  'depositReward' : ActorMethod<[Principal, bigint, bigint], TxReceipt>,
   'deposit_cycles' : ActorMethod<[], undefined>,
   'getCurrentMultiplier' : ActorMethod<[DepositType], number>,
   'getDepositId' : ActorMethod<[Principal], [] | [Array<DepositType>]>,

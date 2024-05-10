@@ -9,6 +9,7 @@ import Overview from './Overview/Overview';
 import MyPosition from './MyPosition/MyPosition';
 import Deposit from './Deposit/Deposit';
 import Withdraw from './Withdraw/Withdraw';
+import AddLiquidityPage from './addLiquidity/AddLiquidityPage';
 
 function Classic() {
   const [menu, setMenu] = useState('Overview');
@@ -39,12 +40,17 @@ function Classic() {
             <WithdrawIcon />
             <div>Withdraw</div>
           </div>
+          <div className={`${styles.buttonMenu} ${menu === 'Liquidity' && styles.selectedButton}`} onClick={() => setMenu('Liquidity')}>
+            <MyPositionIcon />
+            <div>Liquidity</div>
+          </div>
         </div>
         <div className={styles.RightContent}>
           {menu === 'Overview' && <Overview />}
           {menu === 'MyPosition' && <MyPosition />}
           {menu === 'Deposit' && <Deposit />}
           {menu === 'Withdraw' && <Withdraw />}
+          {menu === 'Liquidity' && <AddLiquidityPage />}
         </div>
       </div>
     </div>

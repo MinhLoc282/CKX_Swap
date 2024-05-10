@@ -198,6 +198,11 @@ export const idlFactory = ({ IDL }) => {
     'balanceOf' : IDL.Func([IDL.Text, IDL.Principal], [IDL.Nat], ['query']),
     'burn' : IDL.Func([BurnArgs], [TransferResult], []),
     'deposit' : IDL.Func([IDL.Principal, IDL.Nat, IDL.Nat], [TxReceipt], []),
+    'depositReward' : IDL.Func(
+        [IDL.Principal, IDL.Nat, IDL.Nat],
+        [TxReceipt],
+        [],
+      ),
     'deposit_cycles' : IDL.Func([], [], []),
     'getCurrentMultiplier' : IDL.Func([DepositType], [IDL.Float64], []),
     'getDepositId' : IDL.Func(

@@ -66,7 +66,7 @@ function Overview() {
           </div> */}
           <div className={styles.RightFirstRowElement}>
             <div className={styles.RightTitle}>Current Exchange Rate</div>
-            {pairInfo && pairInfo.reserve0 > 0 && !pairInfo.reserve1 > 0 ? (
+            {pairInfo && pairInfo.reserve0 > 0 && pairInfo.reserve1 > 0 ? (
               pairInfo.reserve1 > pairInfo.reserve0 ? (
                 <div style={{ marginTop: '18px', display: 'flex', gap: '8px' }}>
                   <img src={ckBTC} width={32} alt="" />
@@ -75,7 +75,7 @@ function Overview() {
                   </div>
                   <img src={ckETH} width={32} alt="" />
                   <div style={{ marginTop: '8px' }}>
-                    {pairInfo.reserve1 / pairInfo.reserve0}
+                    {(parseFloat(pairInfo.reserve1) / parseFloat(pairInfo.reserve0)).toFixed(5)}
                     {' '}
                     ckETH
                   </div>
@@ -84,7 +84,7 @@ function Overview() {
                 <div style={{ marginTop: '18px', display: 'flex', gap: '8px' }}>
                   <img src={ckETH} width={32} alt="" />
                   <div style={{ marginTop: '8px' }}>
-                    {pairInfo.reserve0 / pairInfo.reserve1}
+                    {(parseFloat(pairInfo.reserve0) / parseFloat(pairInfo.reserve1)).toFixed(5)}
                     {' '}
                     ckBTC =
                   </div>
@@ -111,7 +111,7 @@ function Overview() {
                 <FiftyPercent />
                 <img src={ckBTC} width={24} height={24} alt="" />
                 <div style={{ alignSelf: 'center' }}>
-                  {pairInfo ? Number(pairInfo.reserve0) : '-'}
+                  {pairInfo ? Number(pairInfo.reserve0 / BigInt(10 ** 18)) : '-'}
                   {' '}
                   BTC
                 </div>
@@ -120,7 +120,7 @@ function Overview() {
                 <FiftyPercent />
                 <img src={ckETH} width={24} height={24} alt="" />
                 <div style={{ alignSelf: 'center' }}>
-                  {pairInfo ? Number(pairInfo.reserve1) : '-'}
+                  {pairInfo ? Number(pairInfo.reserve1 / BigInt(10 ** 18)) : '-'}
                   {' '}
                   ETH
                 </div>

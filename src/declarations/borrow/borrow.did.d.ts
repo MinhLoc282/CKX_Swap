@@ -4,7 +4,7 @@ import type { IDL } from '@dfinity/candid';
 
 export type Balance = bigint;
 export interface Borrow {
-  'borrow' : ActorMethod<[bigint, Principal], string>,
+  'borrow' : ActorMethod<[bigint, Principal, bigint], string>,
   'checkRemoveLP' : ActorMethod<[Array<Principal>], Array<bigint>>,
   'checkRemoveLP_2' : ActorMethod<[Principal], Array<number>>,
   'deposit' : ActorMethod<[bigint], string>,
@@ -27,6 +27,8 @@ export interface Borrow {
 }
 export interface DepositType {
   'startTime' : Time,
+  'duration' : bigint,
+  'interest' : bigint,
   'isUsing' : boolean,
   'reserve0' : bigint,
   'reserve1' : bigint,

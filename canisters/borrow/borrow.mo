@@ -45,7 +45,9 @@ shared (msg) actor class Borrow(
     public type TxReceipt = Result.Result<Nat, Text>;
     type DepositType = {
         amount : Nat;
+        interest : Nat;
         startTime : Time.Time;
+        duration : Nat;
         isActive : Bool;
         tokenIdBorrow : Principal;
         borrow : Nat;
@@ -170,7 +172,9 @@ shared (msg) actor class Borrow(
                         if (r.isActive == false) {
                             var newDepInform : DepositType = {
                                 amount = lpValue;
+                                interest = 0;
                                 startTime = 0;
+                                duration = 0;
                                 isActive = true;
                                 tokenIdBorrow = r.tokenIdBorrow;
                                 borrow = r.borrow;
@@ -184,7 +188,9 @@ shared (msg) actor class Borrow(
                         } else {
                             var newDepInform : DepositType = {
                                 amount = r.amount + lpValue;
+                                interest = 0;
                                 startTime = 0;
+                                duration = 0;
                                 isActive = true;
                                 tokenIdBorrow = r.tokenIdBorrow;
                                 borrow = r.borrow;
@@ -200,7 +206,9 @@ shared (msg) actor class Borrow(
                     case (_) {
                         var newDepInform : DepositType = {
                             amount = lpValue;
+                            interest = 0;
                             startTime = 0;
+                            duration = 0;
                             isActive = true;
                             tokenIdBorrow = token0; // so wwrong
                             borrow = 0;
@@ -223,6 +231,7 @@ shared (msg) actor class Borrow(
     public shared (msg) func borrow(
         borrowValue : Nat,
         tokenId_canister_borrow : Principal,
+        duration: Nat,
     ) : async Text {
         let maybeArray = depositInfoLpToken.get(msg.caller);
 
@@ -259,7 +268,7 @@ shared (msg) actor class Borrow(
                     return "Invalid Token Canister"
                 };
 
-                var tx = await lend(borrowValue, msg.caller, tokenId_canister_borrow, lpValue, msg.caller);
+                var tx = await lend(borrowValue, msg.caller, tokenId_canister_borrow, lpValue, msg.caller, duration);
                 return tx
             };
             case (_) {
@@ -280,7 +289,8 @@ shared (msg) actor class Borrow(
                 };
                 var targetInfo = r;
 
-                var borrowValue = targetInfo.borrow;
+                var interest = targetInfo.borrow / 1000;
+                var borrowValue = targetInfo.borrow - interest;
                 var valueShouldPaid = borrowValue + (borrowValue * fee / 100);
                 var lpValue = targetInfo.amount;
                 var token_canister_to_pay = targetInfo.tokenIdBorrow;
@@ -344,7 +354,9 @@ shared (msg) actor class Borrow(
                             case (?r) {
                                 var newDepInform : DepositType = {
                                     amount = r.amount;
+                                    interest = r.interest + interest ;
                                     startTime = r.startTime;
+                                    duration = r.duration;
                                     isActive = true;
                                     tokenIdBorrow = r.tokenIdBorrow;
                                     borrow = r.borrow;
@@ -359,7 +371,9 @@ shared (msg) actor class Borrow(
                             case (_) {
                                 var newDepInform : DepositType = {
                                     amount = lpValue;
+                                    interest = interest;
                                     startTime = Time.now();
+                                    duration = r.duration;
                                     isActive = true;
                                     tokenIdBorrow = msg.caller;
                                     borrow = borrowValue;
@@ -447,7 +461,9 @@ shared (msg) actor class Borrow(
                                 if (withdraw_value < lpValue) {
                                     var newDepInform : DepositType = {
                                         amount = r.amount - withdraw_value;
+                                        interest = r.interest;
                                         startTime = r.startTime;
+                                        duration = r.duration;
                                         isActive = true;
                                         tokenIdBorrow = r.tokenIdBorrow;
                                         borrow = r.borrow;
@@ -460,7 +476,9 @@ shared (msg) actor class Borrow(
                                 } else {
                                     var newDepInform : DepositType = {
                                         amount = 0;
+                                        interest = r.interest;
                                         startTime = r.startTime;
+                                        duration = r.duration;
                                         isActive = false;
                                         tokenIdBorrow = r.tokenIdBorrow;
                                         borrow = r.borrow;
@@ -476,7 +494,9 @@ shared (msg) actor class Borrow(
                             case (_) {
                                 var newDepInform : DepositType = {
                                     amount = 0;
+                                    interest = 0;
                                     startTime = 0;
+                                    duration = 0;
                                     isActive = false;
                                     tokenIdBorrow = msg.caller;
                                     borrow = 0;
@@ -498,7 +518,13 @@ shared (msg) actor class Borrow(
         }
     };
 
-    private func lend(borrowValue : Nat, user : Principal, tokenId : Principal, lpValue : Nat, caller : Principal) : async Text {
+    private func lend(borrowValue : Nat, user : Principal, tokenId : Principal, lpValue : Nat, caller : Principal, duration : Nat) : async Text {
+        var interest = borrowValue / 1000;
+        var borrowedAmount = borrowValue - interest;
+        var valueShouldPaid = borrowedAmount + (borrowedAmount * fee / 100);
+
+        // Set borrowing deadline based on the current timestamp and borrowed duration
+
         var borrowToken_id = actor (Principal.toText(tokenId)) : actor {
             icrc1_transfer(args : ICRC1.TransferArgs) : async ICRC1.TransferResult
         };
@@ -507,7 +533,7 @@ shared (msg) actor class Borrow(
         let tx0 : ICRC1.TransferResult = await borrowToken_id.icrc1_transfer {
             from_subaccount = null;
             to = { owner = user; subaccount = null };
-            amount = borrowValue;
+            amount = valueShouldPaid;
             memo = null;
             fee = null;
             created_at_time = null
@@ -558,10 +584,12 @@ shared (msg) actor class Borrow(
                     case (?r) {
                         var newDepInform : DepositType = {
                             amount = r.amount;
+                            interest = r.interest + interest;
                             startTime = Time.now();
+                            duration = r.duration;
                             isActive = true;
                             tokenIdBorrow = tokenId;
-                            borrow = borrowValue;
+                            borrow = borrowedAmount;
                             isUsing = true;
                             isAllowWithdraw = false;
                             reserve0 = amountToken0;
@@ -573,10 +601,12 @@ shared (msg) actor class Borrow(
                     case (_) {
                         var newDepInform : DepositType = {
                             amount = lpValue;
+                            interest = interest;
                             startTime = Time.now();
+                            duration = duration;
                             isActive = true;
                             tokenIdBorrow = tokenId;
-                            borrow = borrowValue;
+                            borrow = borrowedAmount;
                             isUsing = true;
                             isAllowWithdraw = false;
                             reserve0 = amountToken0;
@@ -872,7 +902,9 @@ shared (msg) actor class Borrow(
 
                                     var newDepInform : DepositType = {
                                         amount = 0;
+                                        interest = 0;
                                         startTime = r.startTime;
+                                        duration = r.duration;
                                         isActive = false;
                                         tokenIdBorrow = r.tokenIdBorrow;
                                         borrow = 0;

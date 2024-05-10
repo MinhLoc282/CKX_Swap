@@ -13,6 +13,8 @@ type DepositType =
  record {
    amount: nat;
    borrow: nat;
+   duration: nat;
+   interest: nat;
    isActive: bool;
    isAllowWithdraw: bool;
    isUsing: bool;
@@ -23,7 +25,7 @@ type DepositType =
  };
 type Borrow = 
  service {
-   borrow: (nat, principal) -> (text);
+   borrow: (nat, principal, nat) -> (text);
    checkRemoveLP: (vec principal) -> (vec nat);
    checkRemoveLP_2: (principal) -> (vec float64);
    deposit: (nat) -> (text);

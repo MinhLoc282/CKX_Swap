@@ -477,7 +477,8 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
                     subaccount = null
                 };
                 var token_canister = actor (Principal.toText(Principal.fromActor(icrc1TokenActor))) : ICRC1TokenActor;
-                var balance = await token_canister.icrc1_balance_of(depositSubAccount);
+                let balance = await token_canister.icrc1_balance_of(depositSubAccount);
+
                 if (balance >= value +fee) {
                     var defaultSubaccount : Blob = Utils.defaultSubAccount();
                     var transferArg : TransferFromArgs = {
@@ -1023,10 +1024,10 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
                 ("tokenId", #Text(tid)),
                 ("from", #Principal(msg.caller)),
                 ("to", #Principal(msg.caller)),
-                ("amount", #U64(u64(value))),
-                ("fee", #U64(u64(tokens.getFee(tid)))),
-                ("balance", #U64(u64(tokens.balanceOf(tid, msg.caller)))),
-                ("totalSupply", #U64(u64(tokens.totalSupply(tid)))),
+                ("amount", #U(value)),
+                ("fee", #U(tokens.getFee(tid))),
+                ("balance", #U(tokens.balanceOf(tid, msg.caller))),
+                ("totalSupply", #U(tokens.totalSupply(tid))),
             ],
         );
         let tokenCanister = _getTokenActor(tid);
@@ -1061,13 +1062,13 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
             "deposit",
             [
                 ("tokenId", #Text(tid)),
-                ("tokenTxid", #U64(u64(txid))),
+                ("tokenTxid", #U(txid)),
                 ("from", #Principal(msg.caller)),
                 ("to", #Principal(msg.caller)),
-                ("amount", #U64(u64(value))),
-                ("fee", #U64(u64(0))),
-                ("balance", #U64(u64(tokens.balanceOf(tid, msg.caller)))),
-                ("totalSupply", #U64(u64(tokens.totalSupply(tid)))),
+                ("amount", #U(value)),
+                ("fee", #U(0)),
+                ("balance", #U(tokens.balanceOf(tid, msg.caller))),
+                ("totalSupply", #U(tokens.totalSupply(tid))),
             ],
         );
         txcounter += 1;
@@ -1085,10 +1086,10 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
                 ("tokenId", #Text(tid)),
                 ("from", #Principal(msg.caller)),
                 ("to", #Principal(to)),
-                ("amount", #U64(u64(value))),
-                ("fee", #U64(u64(tokens.getFee(tid)))),
-                ("balance", #U64(u64(tokens.balanceOf(tid, to)))),
-                ("totalSupply", #U64(u64(tokens.totalSupply(tid)))),
+                ("amount", #U(value)),
+                ("fee", #U(tokens.getFee(tid))),
+                ("balance", #U(tokens.balanceOf(tid, to))),
+                ("totalSupply", #U(tokens.totalSupply(tid))),
             ],
         );
         let tokenCanister = _getTokenActor(tid);
@@ -1106,13 +1107,13 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
             "deposit",
             [
                 ("tokenId", #Text(tid)),
-                ("tokenTxid", #U64(u64(txid))),
+                ("tokenTxid", #U(txid)),
                 ("from", #Principal(msg.caller)),
                 ("to", #Principal(to)),
-                ("amount", #U64(u64(value))),
-                ("fee", #U64(u64(0))),
-                ("balance", #U64(u64(tokens.balanceOf(tid, to)))),
-                ("totalSupply", #U64(u64(tokens.totalSupply(tid)))),
+                ("amount", #U(value)),
+                ("fee", #U(0)),
+                ("balance", #U(tokens.balanceOf(tid, to))),
+                ("totalSupply", #U(tokens.totalSupply(tid))),
             ],
         );
         txcounter += 1;
@@ -1138,10 +1139,10 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
                 ("tokenId", #Text(tid)),
                 ("from", #Principal(msg.caller)),
                 ("to", #Principal(msg.caller)),
-                ("amount", #U64(u64(value))),
-                ("fee", #U64(u64(tokens.getFee(tid)))),
-                ("balance", #U64(u64(tokens.balanceOf(tid, msg.caller)))),
-                ("totalSupply", #U64(u64(tokens.totalSupply(tid)))),
+                ("amount", #U(value)),
+                ("fee", #U(tokens.getFee(tid))),
+                ("balance", #U(tokens.balanceOf(tid, msg.caller))),
+                ("totalSupply", #U(tokens.totalSupply(tid))),
             ],
         );
         if (Nat.equal(value, 0)) {
@@ -1163,13 +1164,13 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
             "deposit",
             [
                 ("tokenId", #Text(tid)),
-                ("tokenTxid", #U64(u64(txid))),
+                ("tokenTxid", #U(txid)),
                 ("from", #Principal(msg.caller)),
                 ("to", #Principal(msg.caller)),
-                ("amount", #U64(u64(value))),
-                ("fee", #U64(u64(0))),
-                ("balance", #U64(u64(tokens.balanceOf(tid, msg.caller)))),
-                ("totalSupply", #U64(u64(tokens.totalSupply(tid)))),
+                ("amount", #U(value)),
+                ("fee", #U(0)),
+                ("balance", #U(tokens.balanceOf(tid, msg.caller))),
+                ("totalSupply", #U(tokens.totalSupply(tid))),
             ],
         );
         txcounter += 1;
@@ -1198,10 +1199,10 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
                 ("tokenId", #Text(tid)),
                 ("from", #Principal(to)),
                 ("to", #Principal(to)),
-                ("amount", #U64(u64(value))),
-                ("fee", #U64(u64(tokens.getFee(tid)))),
-                ("balance", #U64(u64(tokens.balanceOf(tid, to)))),
-                ("totalSupply", #U64(u64(tokens.totalSupply(tid)))),
+                ("amount", #U(value)),
+                ("fee", #U(tokens.getFee(tid))),
+                ("balance", #U(tokens.balanceOf(tid, to))),
+                ("totalSupply", #U(tokens.totalSupply(tid))),
             ],
         );
         if (value < tokens.getFee(tid)) return #err("value less than token transfer fee");
@@ -1211,13 +1212,13 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
             "deposit",
             [
                 ("tokenId", #Text(tid)),
-                ("tokenTxid", #U64(u64(txid))),
+                ("tokenTxid", #U(txid)),
                 ("from", #Principal(to)),
                 ("to", #Principal(to)),
-                ("amount", #U64(u64(value))),
-                ("fee", #U64(u64(0))),
-                ("balance", #U64(u64(tokens.balanceOf(tid, to)))),
-                ("totalSupply", #U64(u64(tokens.totalSupply(tid)))),
+                ("amount", #U(value)),
+                ("fee", #U(0)),
+                ("balance", #U(tokens.balanceOf(tid, to))),
+                ("totalSupply", #U(tokens.totalSupply(tid))),
             ],
         );
         txcounter += 1;
@@ -1246,13 +1247,13 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
             "deposit",
             [
                 ("tokenId", #Text(tid)),
-                ("tokenTxid", #U64(u64(txid))),
+                ("tokenTxid", #U(txid)),
                 ("from", #Principal(userPId)),
                 ("to", #Principal(userPId)),
-                ("amount", #U64(u64(balance))),
-                ("fee", #U64(u64(0))),
-                ("balance", #U64(u64(tokens.balanceOf(tid, userPId)))),
-                ("totalSupply", #U64(u64(tokens.totalSupply(tid)))),
+                ("amount", #U(balance)),
+                ("fee", #U(0)),
+                ("balance", #U(tokens.balanceOf(tid, userPId))),
+                ("totalSupply", #U(tokens.totalSupply(tid))),
             ],
         );
         txcounter += 1;
@@ -1269,10 +1270,10 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
                 ("tokenId", #Text(tid)),
                 ("from", #Principal(msg.caller)),
                 ("to", #Principal(msg.caller)),
-                ("amount", #U64(u64(value))),
-                ("fee", #U64(u64(tokens.getFee(tid)))),
-                ("balance", #U64(u64(tokens.balanceOf(tid, msg.caller)))),
-                ("totalSupply", #U64(u64(tokens.totalSupply(tid)))),
+                ("amount", #U(value)),
+                ("fee", #U(tokens.getFee(tid))),
+                ("balance", #U(tokens.balanceOf(tid, msg.caller))),
+                ("totalSupply", #U(tokens.totalSupply(tid))),
             ],
         );
         if (tokens.burn(tid, msg.caller, value)) {
@@ -1307,10 +1308,10 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
                                     ("tokenId", #Text(tid)),
                                     ("from", #Principal(msg.caller)),
                                     ("to", #Principal(msg.caller)),
-                                    ("amount", #U64(u64(value))),
-                                    ("fee", #U64(u64(tokens.getFee(tid)))),
-                                    ("balance", #U64(u64(tokens.balanceOf(tid, msg.caller)))),
-                                    ("totalSupply", #U64(u64(tokens.totalSupply(tid)))),
+                                    ("amount", #U(value)),
+                                    ("fee", #U(tokens.getFee(tid))),
+                                    ("balance", #U(tokens.balanceOf(tid, msg.caller))),
+                                    ("totalSupply", #U(tokens.totalSupply(tid))),
                                     ("Error", #Text(debug_show (e))),
                                 ],
                             )
@@ -1332,10 +1333,10 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
                         ("tokenId", #Text(tid)),
                         ("from", #Principal(msg.caller)),
                         ("to", #Principal(msg.caller)),
-                        ("amount", #U64(u64(value))),
-                        ("fee", #U64(u64(tokens.getFee(tid)))),
-                        ("balance", #U64(u64(tokens.balanceOf(tid, msg.caller)))),
-                        ("totalSupply", #U64(u64(tokens.totalSupply(tid)))),
+                        ("amount", #U(value)),
+                        ("fee", #U(tokens.getFee(tid))),
+                        ("balance", #U(tokens.balanceOf(tid, msg.caller))),
+                        ("totalSupply", #U(tokens.totalSupply(tid))),
                         ("Error", #Text(Error.message(e))),
                     ],
                 );
@@ -1346,13 +1347,13 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
                 "withdraw",
                 [
                     ("tokenId", #Text(tid)),
-                    ("tokenTxid", #U64(u64(txid))),
+                    ("tokenTxid", #U(txid)),
                     ("from", #Principal(msg.caller)),
                     ("to", #Principal(msg.caller)),
-                    ("amount", #U64(u64(value))),
-                    ("fee", #U64(u64(fee))),
-                    ("balance", #U64(u64(tokens.balanceOf(tid, msg.caller)))),
-                    ("totalSupply", #U64(u64(tokens.totalSupply(tid)))),
+                    ("amount", #U(value)),
+                    ("fee", #U(fee)),
+                    ("balance", #U(tokens.balanceOf(tid, msg.caller))),
+                    ("totalSupply", #U(tokens.totalSupply(tid))),
                 ],
             );
             txcounter += 1;
@@ -1383,10 +1384,10 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
                 ("tokenId", #Text(tid)),
                 ("from", #Principal(msg.caller)),
                 ("to", #Principal(to)),
-                ("amount", #U64(u64(value))),
-                ("fee", #U64(u64(tokens.getFee(tid)))),
-                ("balance", #U64(u64(tokens.balanceOf(tid, msg.caller)))),
-                ("totalSupply", #U64(u64(tokens.totalSupply(tid))))
+                ("amount", #U(value))),
+                ("fee", #U(tokens.getFee(tid)))),
+                ("balance", #U(tokens.balanceOf(tid, msg.caller)))),
+                ("totalSupply", #U(tokens.totalSupply(tid))))
             ]
         );
         if (tokens.burn(tid, msg.caller, value)) {
@@ -1413,13 +1414,13 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
                 msg.caller, "withdraw",
                 [
                     ("tokenId", #Text(tid)),
-                    ("tokenTxid", #U64(u64(txid))),
+                    ("tokenTxid", #U(txid))),
                     ("from", #Principal(msg.caller)),
                     ("to", #Principal(to)),
-                    ("amount", #U64(u64(value))),
-                    ("fee", #U64(u64(fee))),
-                    ("balance", #U64(u64(tokens.balanceOf(tid, to)))),
-                    ("totalSupply", #U64(u64(tokens.totalSupply(tid))))
+                    ("amount", #U(value))),
+                    ("fee", #U(fee))),
+                    ("balance", #U(tokens.balanceOf(tid, to)))),
+                    ("totalSupply", #U(tokens.totalSupply(tid))))
                 ]
             );
             txcounter += 1;
@@ -1675,11 +1676,11 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
     //             ("pairId", #Text(pair.id)),
     //             ("token0", #Text(pair.token0)),
     //             ("token1", #Text(pair.token1)),
-    //             ("amount0", #U64(u64(amount0))),
-    //             ("amount1", #U64(u64(amount1))),
-    //             ("lpAmount", #U64(u64(lpAmount))),
-    //             ("reserve0", #U64(u64(pair.reserve0))),
-    //             ("reserve1", #U64(u64(pair.reserve1))),
+    //             ("amount0", #U(amount0))),
+    //             ("amount1", #U(amount1))),
+    //             ("lpAmount", #U(lpAmount))),
+    //             ("reserve0", #U(pair.reserve0))),
+    //             ("reserve1", #U(pair.reserve1))),
     //         ],
     //     );
     //     txcounter += 1;
@@ -1774,6 +1775,32 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
             lpAmount := Nat.min(amount0 * totalSupply_ / reserve0, amount1 * totalSupply_ / reserve1);
         };
 
+        switch (_getRewardPair(tid0, tid1)) {
+            case (?p) {
+                p.reserve0 := p.reserve0 + amount0;
+                p.reserve1 := p.reserve1 + amount1;
+            };
+            case (_) {
+              let (t0, t1) = Utils.sortTokens(tid0, tid1);
+                let pair_str = t0 # ":" # t1;
+                let pairinfo : PairInfo = {
+                    id = pair_str;
+                    token0 = t0;
+                    token1 = t1;
+                    creator = owner;
+                    var reserve0 = amount0;
+                    var reserve1 = amount1;
+                    var price0CumulativeLast = 0;
+                    var price1CumulativeLast = 0;
+                    var kLast = 0;
+                    var blockTimestampLast = 0;
+                    var totalSupply = 0;
+                    lptoken = pair_str
+                };
+                rewardPairs.put(pair_str, pairinfo);
+            }
+        };
+
         processReward(tid0, tid1, totalSupply_);
         assert(lpAmount > 0);
         assert(lptokens.mint(pair.id, msg.caller, lpAmount));
@@ -1792,11 +1819,11 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
                 ("pairId", #Text(pair.id)),
                 ("token0", #Text(pair.token0)),
                 ("token1", #Text(pair.token1)),
-                ("amount0", #U64(u64(amount0))),
-                ("amount1", #U64(u64(amount1))),
-                ("lpAmount", #U64(u64(lpAmount))),
-                ("reserve0", #U64(u64(pair.reserve0))),
-                ("reserve1", #U64(u64(pair.reserve1)))
+                ("amount0", #U(amount0)),
+                ("amount1", #U(amount1)),
+                ("lpAmount", #U(lpAmount)),
+                ("reserve0", #U(pair.reserve0)),
+                ("reserve1", #U(pair.reserve1))
             ]
         );
         txcounter += 1;
@@ -1911,6 +1938,32 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
             lpAmount := Nat.min(amount0 * totalSupply_ / reserve0, amount1 * totalSupply_ / reserve1)
         };
 
+        switch (_getRewardPair(tid0, tid1)) {
+            case (?p) {
+                p.reserve0 := p.reserve0 + amount0;
+                p.reserve1 := p.reserve1 + amount1;
+            };
+            case (_) {
+              let (t0, t1) = Utils.sortTokens(tid0, tid1);
+                let pair_str = t0 # ":" # t1;
+                let pairinfo : PairInfo = {
+                    id = pair_str;
+                    token0 = t0;
+                    token1 = t1;
+                    creator = owner;
+                    var reserve0 = amount0;
+                    var reserve1 = amount1;
+                    var price0CumulativeLast = 0;
+                    var price1CumulativeLast = 0;
+                    var kLast = 0;
+                    var blockTimestampLast = 0;
+                    var totalSupply = 0;
+                    lptoken = pair_str
+                };
+                rewardPairs.put(pair_str, pairinfo);
+            }
+        };
+
         processReward(tid0, tid1, totalSupply_);
         assert (lpAmount > 0);
         assert (lptokens.mint(pair.id, userPId, lpAmount));
@@ -1930,11 +1983,11 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
                 ("pairId", #Text(pair.id)),
                 ("token0", #Text(pair.token0)),
                 ("token1", #Text(pair.token1)),
-                ("amount0", #U64(u64(amount0))),
-                ("amount1", #U64(u64(amount1))),
-                ("lpAmount", #U64(u64(lpAmount))),
-                ("reserve0", #U64(u64(pair.reserve0))),
-                ("reserve1", #U64(u64(pair.reserve1))),
+                ("amount0", #U(amount0)),
+                ("amount1", #U(amount1)),
+                ("lpAmount", #U(lpAmount)),
+                ("reserve0", #U(pair.reserve0)),
+                ("reserve1", #U(pair.reserve1)),
             ],
         );
         txcounter += 1;
@@ -1965,7 +2018,7 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
             [
                 ("user", #Principal(user)),
                 ("token", #Principal(tokenId)),
-                ("amount", #U64(u64(amount))),
+                ("amount", #U(amount)),
             ],
         );
         txcounter += 1;
@@ -2003,7 +2056,7 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
             [
                 ("user", #Principal(user)),
                 ("token", #Principal(recoveryDetails.tokenId)),
-                ("amount", #U64(u64(recoveryDetails.amount))),
+                ("amount", #U(recoveryDetails.amount)),
             ],
         );
         txcounter += 1;
@@ -2147,11 +2200,17 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
             if (amount0 < amount0M or amount1 < amount1M) return #err("insufficient output : " # debug_show ({ amount0 = amount0; amount1 = amount1; amount0M = amount0M; amount1M = amount1M }))
         };
 
+        // Calculate 40% of LP tokens to be burned
+        let burnAmount : Nat = lpAmount * 40 / 100;
         // burn user lp
-        if (lptokens.burn(pair.id, msg.caller, lpAmount) == false) return #err("insufficient LP balance or lpAmount too small");
+        if (lptokens.burn(pair.id, msg.caller, burnAmount) == false) return #err("insufficient LP balance or lpAmount too small");
+
+        // Calculate amounts of token0 and token1 to return to the user (40%)
+        let returnAmount0 : Nat = amount0 * burnAmount / lpAmount;
+        let returnAmount1 : Nat = amount1 * burnAmount / lpAmount;
         // transfer tokens to user
-        assert (tokens.zeroFeeTransfer(pair.token0, Principal.fromActor(this), to, amount0));
-        assert (tokens.zeroFeeTransfer(pair.token1, Principal.fromActor(this), to, amount1));
+        assert (tokens.zeroFeeTransfer(pair.token0, Principal.fromActor(this), to, returnAmount0));
+        assert (tokens.zeroFeeTransfer(pair.token1, Principal.fromActor(this), to, returnAmount1));
 
         // mint fee
         if (feeLP > 0) {
@@ -2167,7 +2226,7 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
         if (feeOn) {
             pair.kLast := pair.reserve0 * pair.reserve1
         };
-        pair.totalSupply -= lpAmount;
+        pair.totalSupply := pair.totalSupply - lpAmount + burnAmount;
         pairs.put(pair.id, pair);
         _resetRewardInfo(msg.caller, tid0, tid1);
         swapLastTransaction.put(msg.caller, #RemoveLiquidityOutAmount(amount0, amount1));
@@ -2178,11 +2237,11 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
                 ("pairId", #Text(pair.id)),
                 ("token0", #Text(pair.token0)),
                 ("token1", #Text(pair.token1)),
-                ("lpAmount", #U64(u64(lpAmount))),
-                ("amount0", #U64(u64(amount0))),
-                ("amount1", #U64(u64(amount1))),
-                ("reserve0", #U64(u64(pair.reserve0))),
-                ("reserve1", #U64(u64(pair.reserve1))),
+                ("lpAmount", #U(lpAmount)),
+                ("amount0", #U(amount0)),
+                ("amount1", #U(amount1)),
+                ("reserve0", #U(pair.reserve0)),
+                ("reserve1", #U(pair.reserve1)),
             ],
         );
         txcounter += 1;
@@ -2259,12 +2318,12 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
                 ("pairId", #Text(pair.id)),
                 ("from", #Text(path[i])),
                 ("to", #Text(path[i +1])),
-                ("tokenTxid", #U64(u64(txid))),
-                ("amountIn", #U64(u64(amounts[i]))),
-                ("amountOut", #U64(u64(amounts[i +1]))),
-                ("reserve0", #U64(u64(pair.reserve0))),
-                ("reserve1", #U64(u64(pair.reserve1))),
-                ("fee", #U64(u64(amounts[i] * 3 / 1000))),
+                ("tokenTxid", #U(txid)),
+                ("amountIn", #U(amounts[i])),
+                ("amountOut", #U(amounts[i +1])),
+                ("reserve0", #U(pair.reserve0)),
+                ("reserve1", #U(pair.reserve1)),
+                ("fee", #U(amounts[i] * 3 / 1000)),
             ]);
             if (i == Int.abs(path.size() - 2)) {
                 assert (tokens.zeroFeeTransfer(path[i +1], Principal.fromActor(this), to, amounts[i +1]))
@@ -2401,7 +2460,7 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
         switch (_getRewardPair(tid0, tid1)) {
             case (?p) {
                 reserve0 := p.reserve0;
-                reserve1 := p.reserve1
+                reserve1 := p.reserve1;
             };
             case (_) {}
         };
@@ -2701,8 +2760,8 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
                     [
                         ("tokenId", #Text(tokenId)),
                         ("from", #Principal(msg.caller)),
-                        ("amount", #U64(u64(value))),
-                        ("from_balance", #U64(u64(lptokens.balanceOf(tokenId, msg.caller)))),
+                        ("amount", #U(value)),
+                        ("from_balance", #U(lptokens.balanceOf(tokenId, msg.caller))),
                     ],
                 );
                 txcounter += 1;
@@ -2717,8 +2776,8 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
                     [
                         ("tokenId", #Text(tokenId)),
                         ("from", #Principal(msg.caller)),
-                        ("amount", #U64(u64(value))),
-                        ("from_balance", #U64(u64(tokens.balanceOf(tokenId, msg.caller)))),
+                        ("amount", #U(value)),
+                        ("from_balance", #U(tokens.balanceOf(tokenId, msg.caller))),
                     ],
                 );
                 txcounter += 1
@@ -2738,10 +2797,10 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
                         ("tokenId", #Text(tokenId)),
                         ("from", #Principal(msg.caller)),
                         ("to", #Principal(to)),
-                        ("amount", #U64(u64(value))),
-                        ("fee", #U64(u64(fee))),
-                        ("from_balance", #U64(u64(lptokens.balanceOf(tokenId, msg.caller)))),
-                        ("to_balance", #U64(u64(lptokens.balanceOf(tokenId, to))))
+                        ("amount", #U(value))),
+                        ("fee", #U(fee))),
+                        ("from_balance", #U(lptokens.balanceOf(tokenId, msg.caller)))),
+                        ("to_balance", #U(lptokens.balanceOf(tokenId, to))))
                     ]
                 );
                 txcounter += 1;
@@ -2757,10 +2816,10 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
                         ("tokenId", #Text(tokenId)),
                         ("from", #Principal(msg.caller)),
                         ("to", #Principal(to)),
-                        ("amount", #U64(u64(value))),
-                        ("fee", #U64(u64(fee))),
-                        ("from_balance", #U64(u64(tokens.balanceOf(tokenId, msg.caller)))),
-                        ("to_balance", #U64(u64(tokens.balanceOf(tokenId, to))))
+                        ("amount", #U(value))),
+                        ("fee", #U(fee))),
+                        ("from_balance", #U(tokens.balanceOf(tokenId, msg.caller)))),
+                        ("to_balance", #U(tokens.balanceOf(tokenId, to))))
                     ]
                 );
                 txcounter += 1;
@@ -2780,10 +2839,10 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
                         ("tokenId", #Text(tokenId)),
                         ("from", #Principal(from)),
                         ("to", #Principal(to)),
-                        ("amount", #U64(u64(value))),
-                        ("fee", #U64(u64(fee))),
-                        ("from_balance", #U64(u64(lptokens.balanceOf(tokenId, msg.caller)))),
-                        ("to_balance", #U64(u64(lptokens.balanceOf(tokenId, to)))),
+                        ("amount", #U(value)),
+                        ("fee", #U(fee)),
+                        ("from_balance", #U(lptokens.balanceOf(tokenId, msg.caller))),
+                        ("to_balance", #U(lptokens.balanceOf(tokenId, to))),
                     ],
                 );
                 txcounter += 1;
@@ -2800,10 +2859,10 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
                         ("tokenId", #Text(tokenId)),
                         ("from", #Principal(from)),
                         ("to", #Principal(to)),
-                        ("amount", #U64(u64(value))),
-                        ("fee", #U64(u64(fee))),
-                        ("from_balance", #U64(u64(tokens.balanceOf(tokenId, msg.caller)))),
-                        ("to_balance", #U64(u64(tokens.balanceOf(tokenId, to)))),
+                        ("amount", #U(value)),
+                        ("fee", #U(fee)),
+                        ("from_balance", #U(tokens.balanceOf(tokenId, msg.caller))),
+                        ("to_balance", #U(tokens.balanceOf(tokenId, to))),
                     ],
                 );
                 txcounter += 1
@@ -2823,9 +2882,9 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
                         ("tokenId", #Text(tokenId)),
                         ("from", #Principal(msg.caller)),
                         ("to", #Principal(spender)),
-                        ("amount", #U64(u64(value))),
-                        ("fee", #U64(u64(fee))),
-                        ("allowance", #U64(u64(lptokens.allowance(tokenId, msg.caller, spender)))),
+                        ("amount", #U(value)),
+                        ("fee", #U(fee)),
+                        ("allowance", #U(lptokens.allowance(tokenId, msg.caller, spender))),
                     ],
                 );
                 txcounter += 1;
@@ -2842,9 +2901,9 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
                         ("tokenId", #Text(tokenId)),
                         ("from", #Principal(msg.caller)),
                         ("to", #Principal(spender)),
-                        ("amount", #U64(u64(value))),
-                        ("fee", #U64(u64(fee))),
-                        ("allowance", #U64(u64(tokens.allowance(tokenId, msg.caller, spender)))),
+                        ("amount", #U(value)),
+                        ("fee", #U(fee)),
+                        ("allowance", #U(tokens.allowance(tokenId, msg.caller, spender))),
                     ],
                 );
                 txcounter += 1;
