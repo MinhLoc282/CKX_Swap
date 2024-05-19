@@ -344,7 +344,7 @@ module {
             let bal_new: Nat = bal + value;
             assert(bal_new >= bal);
             token.balances.put(caller, bal_new);
-            // token.totalSupply += value;
+            token.totalSupply += value;
             tokens.put(tokenId, token);
             return true;
         };
@@ -359,7 +359,7 @@ module {
             let bal_new: Nat = bal - value;
             assert(bal_new <= bal);
             token.balances.put(caller, bal_new);
-            // token.totalSupply -= value;
+            token.totalSupply -= value;
             tokens.put(tokenId, token);
             return true;
         };

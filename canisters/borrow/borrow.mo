@@ -54,19 +54,14 @@ shared (msg) actor class Borrow(
         isUsing : Bool;
         isAllowWithdraw : Bool;
         reserve0 : Nat;
-        reserve1 : Nat
+        reserve1 : Nat;
+        loadId : Nat;
     };
 
     type LoanDetail = {
         id : Nat;
-        // startTime : Time.Time;
-        // isActive : Bool;
-        // tokenIdBorrow : Principal;
-        // borrow : Nat;
-        // isUsing : Bool;
-        // isAllowWithdraw : Bool;
-        // reserve0 : Nat;
-        // reserve1 : Nat;
+        tokenIdBorrow : Principal;
+        isRepaid : Bool;
         borrower : Principal
     };
 
@@ -181,7 +176,8 @@ shared (msg) actor class Borrow(
                                 isUsing = false;
                                 isAllowWithdraw = r.isAllowWithdraw;
                                 reserve0 = r.reserve0;
-                                reserve1 = r.reserve1
+                                reserve1 = r.reserve1;
+                                loadId = r.loadId;
                             };
                             depositInfoLpToken.put(msg.caller, newDepInform);
                             return "Update deposit"
@@ -195,9 +191,10 @@ shared (msg) actor class Borrow(
                                 tokenIdBorrow = r.tokenIdBorrow;
                                 borrow = r.borrow;
                                 isUsing = false;
-                                isAllowWithdraw = r.isAllowWithdraw;
+                                isAllowWithdraw = true;
                                 reserve0 = 0;
-                                reserve1 = 0
+                                reserve1 = 0;
+                                loadId = 0;
                             };
                             depositInfoLpToken.put(msg.caller, newDepInform);
                             return "Update deposit"
@@ -215,7 +212,8 @@ shared (msg) actor class Borrow(
                             isUsing = false;
                             isAllowWithdraw = true;
                             reserve0 = 0;
-                            reserve1 = 0
+                            reserve1 = 0;
+                            loadId = 0;
                         };
                         depositInfoLpToken.put(msg.caller, newDepInform);
                         return "Update new deposit"
@@ -290,7 +288,7 @@ shared (msg) actor class Borrow(
                 var targetInfo = r;
 
                 var interest = targetInfo.borrow / 1000;
-                var borrowValue = targetInfo.borrow - interest;
+                var borrowValue = targetInfo.borrow + interest;
                 var valueShouldPaid = borrowValue + (borrowValue * fee / 100);
                 var lpValue = targetInfo.amount;
                 var token_canister_to_pay = targetInfo.tokenIdBorrow;
@@ -359,13 +357,24 @@ shared (msg) actor class Borrow(
                                     duration = r.duration;
                                     isActive = true;
                                     tokenIdBorrow = r.tokenIdBorrow;
-                                    borrow = r.borrow;
+                                    borrow = 0;
                                     isUsing = false;
                                     isAllowWithdraw = true;
                                     reserve0 = 0;
-                                    reserve1 = 0
+                                    reserve1 = 0;
+                                    loadId = 0;
                                 };
                                 depositInfoLpToken.put(msg.caller, newDepInform);
+
+                                // Update the corresponding LoanDetail record
+                                let updatedLoanDetail: LoanDetail = {
+                                    id = r.loadId;
+                                    borrower = msg.caller;
+                                    tokenIdBorrow = r.tokenIdBorrow;
+                                    isRepaid = true;
+                                };
+                                loanDetailList.put(r.loadId, updatedLoanDetail);
+
                                 return "Ok, you can withdraw your deposit now"
                             };
                             case (_) {
@@ -375,12 +384,13 @@ shared (msg) actor class Borrow(
                                     startTime = Time.now();
                                     duration = r.duration;
                                     isActive = true;
-                                    tokenIdBorrow = msg.caller;
-                                    borrow = borrowValue;
+                                    tokenIdBorrow = r.tokenIdBorrow;
+                                    borrow = 0;
                                     isUsing = false;
                                     isAllowWithdraw = true;
                                     reserve0 = 0;
-                                    reserve1 = 0
+                                    reserve1 = 0;
+                                    loadId = 0;
                                 };
                                 depositInfoLpToken.put(msg.caller, newDepInform);
                                 return "Ok you can withdraw your deposit now"
@@ -470,7 +480,8 @@ shared (msg) actor class Borrow(
                                         isUsing = r.isUsing;
                                         isAllowWithdraw = true;
                                         reserve0 = 0;
-                                        reserve1 = 0
+                                        reserve1 = 0;
+                                        loadId = 0;
                                     };
                                     depositInfoLpToken.put(msg.caller, newDepInform)
                                 } else {
@@ -483,9 +494,10 @@ shared (msg) actor class Borrow(
                                         tokenIdBorrow = r.tokenIdBorrow;
                                         borrow = r.borrow;
                                         isUsing = r.isUsing;
-                                        isAllowWithdraw = false;
+                                        isAllowWithdraw = true;
                                         reserve0 = 0;
-                                        reserve1 = 0
+                                        reserve1 = 0;
+                                        loadId = 0;
                                     };
                                     depositInfoLpToken.put(msg.caller, newDepInform)
                                 };
@@ -498,12 +510,13 @@ shared (msg) actor class Borrow(
                                     startTime = 0;
                                     duration = 0;
                                     isActive = false;
-                                    tokenIdBorrow = msg.caller;
+                                    tokenIdBorrow = token0;
                                     borrow = 0;
                                     isUsing = false;
-                                    isAllowWithdraw = false;
+                                    isAllowWithdraw = true;
                                     reserve0 = 0;
-                                    reserve1 = 0
+                                    reserve1 = 0;
+                                    loadId = 0;
                                 };
                                 depositInfoLpToken.put(msg.caller, newDepInform);
                                 return "Withdraw Successful"
@@ -520,8 +533,6 @@ shared (msg) actor class Borrow(
 
     private func lend(borrowValue : Nat, user : Principal, tokenId : Principal, lpValue : Nat, caller : Principal, duration : Nat) : async Text {
         var interest = borrowValue / 1000;
-        var borrowedAmount = borrowValue - interest;
-        var valueShouldPaid = borrowedAmount + (borrowedAmount * fee / 100);
 
         // Set borrowing deadline based on the current timestamp and borrowed duration
 
@@ -533,7 +544,7 @@ shared (msg) actor class Borrow(
         let tx0 : ICRC1.TransferResult = await borrowToken_id.icrc1_transfer {
             from_subaccount = null;
             to = { owner = user; subaccount = null };
-            amount = valueShouldPaid;
+            amount = borrowValue;
             memo = null;
             fee = null;
             created_at_time = null
@@ -578,22 +589,28 @@ shared (msg) actor class Borrow(
                 var amountToken0 = amountTokens[0];
                 var amountToken1 = amountTokens[1];
 
-                addNewLoanDetail(loanId, caller);
+                addNewLoanDetail(loanId, caller, tokenId);
 
                 switch (maybeArray) {
                     case (?r) {
+                        var newDuration : Nat = 0;
+                        if (r.duration == 0) {
+                          newDuration := duration
+                        };
+
                         var newDepInform : DepositType = {
                             amount = r.amount;
                             interest = r.interest + interest;
                             startTime = Time.now();
-                            duration = r.duration;
+                            duration = newDuration;
                             isActive = true;
                             tokenIdBorrow = tokenId;
-                            borrow = borrowedAmount;
+                            borrow = borrowValue;
                             isUsing = true;
                             isAllowWithdraw = false;
                             reserve0 = amountToken0;
-                            reserve1 = amountToken1
+                            reserve1 = amountToken1;
+                            loadId = loanId;
                         };
                         depositInfoLpToken.put(user, newDepInform);
                         return "Success"
@@ -606,11 +623,12 @@ shared (msg) actor class Borrow(
                             duration = duration;
                             isActive = true;
                             tokenIdBorrow = tokenId;
-                            borrow = borrowedAmount;
+                            borrow = borrowValue;
                             isUsing = true;
                             isAllowWithdraw = false;
                             reserve0 = amountToken0;
-                            reserve1 = amountToken1
+                            reserve1 = amountToken1;
+                            loadId = loanId;
                         };
                         depositInfoLpToken.put(user, newDepInform);
                         return "Successful"
@@ -819,102 +837,201 @@ shared (msg) actor class Borrow(
                                 /// transfer token
                                 try {
                                     var token0_canister = actor (Principal.toText(token0)) : actor {
-                                        icrc1_transfer(args : ICRC1.TransferArgs) : async ICRC1.TransferResult
+                                        icrc1_transfer(args : ICRC1.TransferArgs) : async ICRC1.TransferResult;
+                                        icrc2_approve(args : ICRC1.ApproveArgs) : async ICRC1.ApproveResult
                                     };
                                     var token1_canister = actor (Principal.toText(token1)) : actor {
-                                        icrc1_transfer(args : ICRC1.TransferArgs) : async ICRC1.TransferResult
+                                        icrc1_transfer(args : ICRC1.TransferArgs) : async ICRC1.TransferResult;
+                                        icrc2_approve(args : ICRC1.ApproveArgs) : async ICRC1.ApproveResult
                                     };
                                     var swap_canister = actor (swap_id) : actor {
                                         withdraw(tokenId : Principal, value : Nat) : async TxReceipt
+                                    };
+                                    var aggregtor_canister = actor (Principal.toText(aggregator_id)) : actor {
+                                        addLPForUser(
+                                            userPId : Principal,
+                                            token0 : Principal,
+                                            token1 : Principal,
+                                            amount0Desired : Nat,
+                                            amount1Desired : Nat,
+                                            amount0Min : Nat,
+                                            amount1Min : Nat,
+                                            deadline : Int,
+                                        ) : async Text;
                                     };
                                     var defaultSubaccount : Blob = Utils.defaultSubAccount();
                                     Debug.print("PreCheck:");
                                     var value0 = (r.amount * reserve0 / totalSupply);
                                     var value1 = (r.amount * reserve1 / totalSupply);
-                                    Debug.print(debug_show ((value0 - r.borrow, value1 - r.borrow)));
                                     Debug.print("End preCheck:");
+                                    var add_call : Text = "";
                                     if (r.tokenIdBorrow == token0) {
                                         var withdrawToken0 = await swap_canister.withdraw(token0, value0);
                                         var withdrawToken1 = await swap_canister.withdraw(token1, value1);
                                         Debug.print("Check 1:");
                                         Debug.print(debug_show ((withdrawToken0, withdrawToken1)));
-                                        var transferArg : ICRC1.TransferArgs = {
+                                        // var transferArg : ICRC1.TransferArgs = {
+                                        //     from_subaccount = null;
+                                        //     created_at_time = null;
+                                        //     fee = null;
+                                        //     memo = null;
+                                        //     to = {
+                                        //         owner = principal;
+                                        //         subaccount = ?defaultSubaccount
+                                        //     };
+                                        //     amount = value0 - r.borrow
+                                        // };
+                                        // var txResult = await token0_canister.icrc1_transfer(transferArg);
+                                        // var transferArg1 : ICRC1.TransferArgs = {
+                                        //     from_subaccount = null;
+                                        //     created_at_time = null;
+                                        //     fee = null;
+                                        //     memo = null;
+                                        //     to = {
+                                        //         owner = principal;
+                                        //         subaccount = ?defaultSubaccount
+                                        //     };
+                                        //     amount = value1
+                                        // };
+                                        // var txResult1 = await token1_canister.icrc1_transfer(transferArg1);
+
+                                        let approve : ICRC1.ApproveResult = await token0_canister.icrc2_approve {
                                             from_subaccount = null;
-                                            created_at_time = null;
+                                            spender = aggregator_id;
+                                            amount = value0 - r.borrow;
+                                            expires_at = null;
                                             fee = null;
                                             memo = null;
-                                            to = {
-                                                owner = principal;
-                                                subaccount = ?defaultSubaccount
-                                            };
-                                            amount = value0 - r.borrow
-                                        };
-                                        var txResult = await token0_canister.icrc1_transfer(transferArg);
-                                        var transferArg1 : ICRC1.TransferArgs = {
-                                            from_subaccount = null;
                                             created_at_time = null;
+                                            expected_allowance = null
+                                        };
+
+                                        let approve2 : ICRC1.ApproveResult = await token1_canister.icrc2_approve {
+                                            from_subaccount = null;
+                                            spender = aggregator_id;
+                                            amount = value1;
+                                            expires_at = null;
                                             fee = null;
                                             memo = null;
-                                            to = {
-                                                owner = principal;
-                                                subaccount = ?defaultSubaccount
-                                            };
-                                            amount = value1
+                                            created_at_time = null;
+                                            expected_allowance = null
                                         };
-                                        var txResult1 = await token1_canister.icrc1_transfer(transferArg1)
+                                        Debug.print("Approve");
+                                        Debug.print(debug_show(approve, approve2));
+
+                                        add_call := await aggregtor_canister.addLPForUser(
+                                          principal,
+                                          token0,
+                                          token1,
+                                          value0 - r.borrow,
+                                          value1,
+                                          0,
+                                          0,
+                                          Time.now() +10000000000
+                                        )
                                     } else {
-                                        var withdrawToken0 = await swap_canister.withdraw(token0, value0);
-                                        var withdrawToken1 = await swap_canister.withdraw(token1, value1);
+                                        var withdrawToken0 = await swap_canister.withdraw(token0, value1);
+                                        var withdrawToken1 = await swap_canister.withdraw(token1, value0);
                                         Debug.print("Check 2:");
                                         Debug.print(debug_show ((withdrawToken0, withdrawToken1)));
-                                        var token0_canister = actor (Principal.toText(token0)) : actor {
-                                            icrc1_transfer(args : ICRC1.TransferArgs) : async ICRC1.TransferResult
-                                        };
-                                        var token1_canister = actor (Principal.toText(token1)) : actor {
-                                            icrc1_transfer(args : ICRC1.TransferArgs) : async ICRC1.TransferResult
-                                        };
-                                        var defaultSubaccount : Blob = Utils.defaultSubAccount();
-                                        var transferArg : ICRC1.TransferArgs = {
+                                        // var transferArg : ICRC1.TransferArgs = {
+                                        //     from_subaccount = null;
+                                        //     created_at_time = null;
+                                        //     fee = null;
+                                        //     memo = null;
+                                        //     to = {
+                                        //         owner = principal;
+                                        //         subaccount = ?defaultSubaccount
+                                        //     };
+                                        //     amount = value0
+                                        // };
+                                        // var txResult = await token0_canister.icrc1_transfer(transferArg);
+                                        // var transferArg1 : ICRC1.TransferArgs = {
+                                        //     from_subaccount = null;
+                                        //     created_at_time = null;
+                                        //     fee = null;
+                                        //     memo = null;
+                                        //     to = {
+                                        //         owner = principal;
+                                        //         subaccount = ?defaultSubaccount
+                                        //     };
+                                        //     amount = value1 - r.borrow
+                                        // };
+                                        // var txResult1 = await token1_canister.icrc1_transfer(transferArg1)
+
+                                        let approve : ICRC1.ApproveResult = await token0_canister.icrc2_approve {
                                             from_subaccount = null;
-                                            created_at_time = null;
+                                            spender = aggregator_id;
+                                            amount = value0 - r.borrow;
+                                            expires_at = null;
                                             fee = null;
                                             memo = null;
-                                            to = {
-                                                owner = principal;
-                                                subaccount = ?defaultSubaccount
-                                            };
-                                            amount = value0
-                                        };
-                                        var txResult = await token0_canister.icrc1_transfer(transferArg);
-                                        var transferArg1 : ICRC1.TransferArgs = {
-                                            from_subaccount = null;
                                             created_at_time = null;
+                                            expected_allowance = null
+                                        };
+
+                                        let approve2 : ICRC1.ApproveResult = await token1_canister.icrc2_approve {
+                                            from_subaccount = null;
+                                            spender = aggregator_id;
+                                            amount = value1;
+                                            expires_at = null;
                                             fee = null;
                                             memo = null;
-                                            to = {
-                                                owner = principal;
-                                                subaccount = ?defaultSubaccount
-                                            };
-                                            amount = value1 - r.borrow
+                                            created_at_time = null;
+                                            expected_allowance = null
                                         };
-                                        var txResult1 = await token1_canister.icrc1_transfer(transferArg1)
+                                        Debug.print("Approve");
+                                        Debug.print(debug_show(approve, approve2));
+
+                                        add_call := await aggregtor_canister.addLPForUser(
+                                          principal,
+                                          token0,
+                                          token1,
+                                          value0 - r.borrow,
+                                          value1,
+                                          0,
+                                          0,
+                                          Time.now() +10000000000
+                                        );
                                     };
 
-                                    var newDepInform : DepositType = {
-                                        amount = 0;
-                                        interest = 0;
-                                        startTime = r.startTime;
-                                        duration = r.duration;
-                                        isActive = false;
-                                        tokenIdBorrow = r.tokenIdBorrow;
-                                        borrow = 0;
-                                        isUsing = false;
-                                        isAllowWithdraw = false;
-                                        reserve0 = 0;
-                                        reserve1 = 0
+                                    if (add_call == "Ok") {
+                                      let maybeDepositType = depositInfoLpToken.get(principal);
+                                          switch (maybeDepositType) {
+                                              case (?r) {
+                                                  let updatedLoanDetail: LoanDetail = {
+                                                      id = r.loadId;
+                                                      borrower = principal;
+                                                      tokenIdBorrow = r.tokenIdBorrow;
+                                                      isRepaid = true;
+                                                  };
+                                                  loanDetailList.put(r.loadId, updatedLoanDetail);
+
+                                                  var newDepInform : DepositType = {
+                                                      amount = 0;
+                                                      startTime = r.startTime;
+                                                      duration = 0;
+                                                      interest = 0;
+                                                      isActive = false;
+                                                      tokenIdBorrow = r.tokenIdBorrow;
+                                                      borrow = 0;
+                                                      isUsing = false;
+                                                      isAllowWithdraw = false;
+                                                      reserve0 = 0;
+                                                      reserve1 = 0;
+                                                      loadId = 0;
+                                                  };
+                                                  depositInfoLpToken.put(principal, newDepInform);
+                                                  rtArr := Array.append(rtArr, [1]);
+                                              };
+                                              case null {
+                                                  // No DepositType found for this Principal
+                                                  rtArr := Array.append(rtArr, [5])
+                                              };
+                                          }
+                                    } else {
+                                      rtArr := Array.append(rtArr, [2]);
                                     };
-                                    depositInfoLpToken.put(principal, newDepInform);
-                                    rtArr := Array.append(rtArr, [1])
                                 } catch (error) {
                                     rtArr := Array.append(rtArr, [4])
                                 };
@@ -992,28 +1109,15 @@ shared (msg) actor class Borrow(
 
     private func addNewLoanDetail(
         id : Nat,
-        // startTime : Time.Time,
-        // isActive : Bool,
-        // tokenIdBorrow : Principal,
-        // borrow : Nat,
-        // isUsing : Bool,
-        // isAllowWithdraw : Bool,
-        // reserve0 : Nat,
-        // reserve1 : Nat,
         borrower : Principal,
+        tokenIdBorrow : Principal,
     ) {
         loanId += 1;
         var newLoanInform : LoanDetail = {
             id = loanId;
-            // startTime = startTime;
-            // isActive = isActive;
-            // tokenIdBorrow = tokenIdBorrow;
-            // borrow = borrow;
-            // isUsing = isUsing;
-            // isAllowWithdraw = isAllowWithdraw;
-            // reserve0 = reserve0;
-            // reserve1 = reserve1
-            borrower = borrower
+            borrower = borrower;
+            tokenIdBorrow = tokenIdBorrow;
+            isRepaid = false;
         };
         loanDetailList.put(loanId, newLoanInform);
     };

@@ -11,8 +11,8 @@
   margin: auto;
   padding: 24px;
 
-  background-color: rgb(17, 25, 54);
   border-radius: 12px;
+  border: 1px solid rgba(44, 45, 59, 1);
 }
 
 form {
@@ -25,6 +25,7 @@ form {
   align-items: center;
 
   width: 100%;
+  margin-bottom: 20px;
 }
 
 .TitleContainer h1 {
@@ -101,7 +102,7 @@ input[type="number"]::placeholder {
   width: 50%;
   padding: 20px;
 
-  background-color: rgb(17, 25, 54);
+  border-left: 1px solid rgba(44, 45, 59, 1);
 }
 
 .PriceRange h2 {

@@ -65,7 +65,7 @@ function RepayPopup({
         memo: [],
         from_subaccount: [],
         created_at_time: [],
-        amount: Number(borrowInfo.borrow) * 1.1,
+        amount: Number(borrowInfo.borrow) * 1.5,
         expected_allowance: [],
         expires_at: [],
         spender: Principal.fromText(borrow.canisterId),
@@ -74,12 +74,12 @@ function RepayPopup({
       try {
         setLoading(true);
         let tokenIdPay = token0Actor;
-        if (borrowInfo.tokenIdBorrow === token0.canisterId) {
+        if (borrowInfo.tokenIdBorrow.toText() === token0.canisterId) {
           tokenIdPay = token0Actor;
         } else {
           tokenIdPay = token1Actor;
         }
-        const tx0 = await token0Actor.icrc2_approve(record);
+        const tx0 = await tokenIdPay.icrc2_approve(record);
         console.log('Approve: ', tx0);
         const tx = await borrowActor.rePay();
         console.log(tx);

@@ -32,17 +32,17 @@ function Classic() {
             <MyPositionIcon />
             <div>My Position</div>
           </div> */}
-          <div className={`${styles.buttonMenu} ${menu === 'Deposit' && styles.selectedButton}`} onClick={() => setMenu('Deposit')}>
+          {/* <div className={`${styles.buttonMenu} ${menu === 'Deposit' && styles.selectedButton}`} onClick={() => setMenu('Deposit')}>
             <DepositIcon />
+            <div>Deposit</div>
+          </div> */}
+          <div className={`${styles.buttonMenu} ${menu === 'Liquidity' && styles.selectedButton}`} onClick={() => setMenu('Liquidity')}>
+            <MyPositionIcon />
             <div>Deposit</div>
           </div>
           <div className={`${styles.buttonMenu} ${menu === 'Withdraw' && styles.selectedButton}`} onClick={() => setMenu('Withdraw')}>
             <WithdrawIcon />
             <div>Withdraw</div>
-          </div>
-          <div className={`${styles.buttonMenu} ${menu === 'Liquidity' && styles.selectedButton}`} onClick={() => setMenu('Liquidity')}>
-            <MyPositionIcon />
-            <div>Liquidity</div>
           </div>
         </div>
         <div className={styles.RightContent}>

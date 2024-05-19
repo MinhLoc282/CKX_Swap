@@ -32,13 +32,19 @@ export interface DepositType {
   'isUsing' : boolean,
   'reserve0' : bigint,
   'reserve1' : bigint,
+  'loadId' : bigint,
   'borrow' : bigint,
   'isActive' : boolean,
   'tokenIdBorrow' : Principal,
   'isAllowWithdraw' : boolean,
   'amount' : bigint,
 }
-export interface LoanDetail { 'id' : bigint, 'borrower' : Principal }
+export interface LoanDetail {
+  'id' : bigint,
+  'isRepaid' : boolean,
+  'borrower' : Principal,
+  'tokenIdBorrow' : Principal,
+}
 export type Time = bigint;
 export type TxReceipt = { 'ok' : bigint } |
   { 'err' : string };

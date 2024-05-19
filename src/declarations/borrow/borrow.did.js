@@ -7,13 +7,19 @@ export const idlFactory = ({ IDL }) => {
     'isUsing' : IDL.Bool,
     'reserve0' : IDL.Nat,
     'reserve1' : IDL.Nat,
+    'loadId' : IDL.Nat,
     'borrow' : IDL.Nat,
     'isActive' : IDL.Bool,
     'tokenIdBorrow' : IDL.Principal,
     'isAllowWithdraw' : IDL.Bool,
     'amount' : IDL.Nat,
   });
-  const LoanDetail = IDL.Record({ 'id' : IDL.Nat, 'borrower' : IDL.Principal });
+  const LoanDetail = IDL.Record({
+    'id' : IDL.Nat,
+    'isRepaid' : IDL.Bool,
+    'borrower' : IDL.Principal,
+    'tokenIdBorrow' : IDL.Principal,
+  });
   const Balance = IDL.Nat;
   const TxReceipt = IDL.Variant({ 'ok' : IDL.Nat, 'err' : IDL.Text });
   const Borrow = IDL.Service({

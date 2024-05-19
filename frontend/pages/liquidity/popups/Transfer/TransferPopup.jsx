@@ -70,7 +70,7 @@ function AddTokenPopup({
             amount: amountInput,
           });
         } else if (tokenPrincipal === token1.canisterId) {
-          await token1Actor.icrc1_balance_of({
+          await token1Actor.icrc1_transfer({
             to: Principal.fromText(transferPrincipal),
             amount: amountInput,
           });

@@ -1,12 +1,35 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { Principal } from '@dfinity/principal';
 import { Link } from 'react-router-dom';
 import styles from './index.module.css';
 
 import ckBTC from '../../assets/ckBTC.png';
 import ckETH from '../../assets/ckETH.png';
 import ICP from '../../assets/ICP.png';
+import { useAuth } from '../../hooks/use-auth-client';
+import * as token0 from '../../../src/declarations/token0';
+import * as token1 from '../../../src/declarations/token1';
 
 function PoolPage() {
+  const { swapActor } = useAuth();
+  const [pairInfo, setPairInfo] = useState(null);
+
+  useEffect(() => {
+    const fetchPairInfo = async () => {
+      try {
+        const pair = await swapActor
+          .getPair(Principal.fromText(token0.canisterId), Principal.fromText(token1.canisterId));
+        setPairInfo(pair[0]);
+      } catch (error) {
+        console.error('Error fetching pair info:', error);
+      }
+    };
+
+    if (swapActor) {
+      fetchPairInfo();
+    }
+  }, [swapActor]);
+
   return (
     <div className={styles.PageContainer}>
       <div className={styles.Heading}>Pools</div>
@@ -64,8 +87,25 @@ function PoolPage() {
               <div style={{ color: 'rgba(172, 179, 249, 1)', alignSelf: 'center' }}>Classic</div>
             </div>
           </div>
-          <div className={styles.GridLiquidity}>
-            <div style={{ marginTop: '4px' }}>$17,003,450.69</div>
+          <div className={styles.GridLiquidity} style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <img src={ckETH} width={24} height={24} alt="" />
+                <div style={{ alignSelf: 'center' }}>
+                  {pairInfo ? Number(pairInfo.reserve0 / BigInt(10 ** 18)) : '-'}
+                  {' '}
+                  ETH
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <img src={ckBTC} width={24} height={24} alt="" />
+                <div style={{ alignSelf: 'center' }}>
+                  {pairInfo ? Number(pairInfo.reserve1 / BigInt(10 ** 18)) : '-'}
+                  {' '}
+                  BTC
+                </div>
+              </div>
+            </div>
           </div>
           <div className={styles.GridAPR}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>

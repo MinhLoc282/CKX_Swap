@@ -118,6 +118,31 @@ function AddLiquidityPage() {
     }
   };
 
+  const handleGetUserBalances = async () => {
+    const token0ActorForSelectedToken = token0.createActor(validation.values.token0, {
+      agentOptions: {
+        identity,
+      },
+    });
+
+    const token1ActorForSelectedToken = token1.createActor(validation.values.token1, {
+      agentOptions: {
+        identity,
+      },
+    });
+
+    const token0Balance = await token0ActorForSelectedToken.icrc1_balance_of({
+      owner: principal,
+      subaccount: [],
+    });
+    const token1Balance = await token1ActorForSelectedToken.icrc1_balance_of({
+      owner: principal,
+      subaccount: [],
+    });
+
+    setUserBalances([token0Balance, token1Balance]);
+  };
+
   useEffect(() => {
     if (
       !Number.isNaN(validation.values.amount0Desired)
@@ -187,31 +212,6 @@ function AddLiquidityPage() {
   }, [price]);
 
   useEffect(() => {
-    const handleGetUserBalances = async () => {
-      const token0ActorForSelectedToken = token0.createActor(validation.values.token0, {
-        agentOptions: {
-          identity,
-        },
-      });
-
-      const token1ActorForSelectedToken = token1.createActor(validation.values.token1, {
-        agentOptions: {
-          identity,
-        },
-      });
-
-      const token0Balance = await token0ActorForSelectedToken.icrc1_balance_of({
-        owner: principal,
-        subaccount: [],
-      });
-      const token1Balance = await token1ActorForSelectedToken.icrc1_balance_of({
-        owner: principal,
-        subaccount: [],
-      });
-
-      setUserBalances([token0Balance, token1Balance]);
-    };
-
     if (swapActor && principal && validation.values.token0
       && validation.values.token1 && token0Actor && token1Actor) {
       handleGetUserBalances();
@@ -259,6 +259,7 @@ function AddLiquidityPage() {
                   onChange={validation.handleChange}
                   onBlur={validation.handleBlur}
                   value={validation.values.amount0Desired || 0}
+                  disabled={!bothTokensSelected}
                 />
                 {validation.touched.amount0Desired && validation.errors.amount0Desired && (
                 <div>{validation.errors.amount0Desired}</div>
@@ -352,9 +353,13 @@ function AddLiquidityPage() {
         isAddLiquidityModalOpen={isAddLiquidityModalOpen}
         closeAddLiquidityModal={closeAddLiquidityModal}
         formValues={formValues}
+        validation={validation}
+        setAmount0Desired={setAmount0Desired}
+        setAmount1Desired={setAmount1Desired}
         price={price}
         priceMin={priceMin}
         priceMax={priceMax}
+        handleGetUserBalances={handleGetUserBalances}
       />
     </div>
   );

@@ -287,6 +287,7 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
     type SwapLastTransaction = {
         #SwapOutAmount : Nat;
         #RemoveLiquidityOutAmount : (Nat, Nat);
+        #RemoveLiquidityOneTokenOutAmount : (Nat);
         #NotFound : Bool
     };
 
@@ -1276,6 +1277,8 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
                 ("totalSupply", #U(tokens.totalSupply(tid))),
             ],
         );
+        Debug.print("PreCheck:");
+        Debug.print((debug_show ((value, tid))));
         if (tokens.burn(tid, msg.caller, value)) {
             let tokenCanister = _getTokenActor(tid);
             let fee = tokens.getFee(tid);
@@ -1359,7 +1362,9 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
             txcounter += 1;
             return #ok(txcounter - 1)
         } else {
-            return #err("burn token failed:" # tid)
+          let callerBalance = tokens.balanceOf(tid, msg.caller);
+          let errorMessage : Text = "Burn token failed for tokenId: " # tid # "\nCaller: " # Principal.toText(msg.caller) # "\nRequested Amount: " # Nat.toText(value) # "\nCaller Balance: " # Nat.toText(callerBalance) # "\nReason: Insufficient balance or other conditions not met.";
+            return #err(errorMessage)
         }
     };
     private func addFailedWithdraws(tokenId : Text, userPId : Principal, value : Nat) {
@@ -2200,17 +2205,12 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
             if (amount0 < amount0M or amount1 < amount1M) return #err("insufficient output : " # debug_show ({ amount0 = amount0; amount1 = amount1; amount0M = amount0M; amount1M = amount1M }))
         };
 
-        // Calculate 40% of LP tokens to be burned
-        let burnAmount : Nat = lpAmount * 40 / 100;
         // burn user lp
-        if (lptokens.burn(pair.id, msg.caller, burnAmount) == false) return #err("insufficient LP balance or lpAmount too small");
+        if (lptokens.burn(pair.id, msg.caller, lpAmount) == false) return #err("insufficient LP balance or lpAmount too small");
 
-        // Calculate amounts of token0 and token1 to return to the user (40%)
-        let returnAmount0 : Nat = amount0 * burnAmount / lpAmount;
-        let returnAmount1 : Nat = amount1 * burnAmount / lpAmount;
         // transfer tokens to user
-        assert (tokens.zeroFeeTransfer(pair.token0, Principal.fromActor(this), to, returnAmount0));
-        assert (tokens.zeroFeeTransfer(pair.token1, Principal.fromActor(this), to, returnAmount1));
+        assert (tokens.zeroFeeTransfer(pair.token0, Principal.fromActor(this), to, amount0));
+        assert (tokens.zeroFeeTransfer(pair.token1, Principal.fromActor(this), to, amount1));
 
         // mint fee
         if (feeLP > 0) {
@@ -2226,7 +2226,7 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
         if (feeOn) {
             pair.kLast := pair.reserve0 * pair.reserve1
         };
-        pair.totalSupply := pair.totalSupply - lpAmount + burnAmount;
+        pair.totalSupply -= lpAmount;
         pairs.put(pair.id, pair);
         _resetRewardInfo(msg.caller, tid0, tid1);
         swapLastTransaction.put(msg.caller, #RemoveLiquidityOutAmount(amount0, amount1));
@@ -3239,6 +3239,7 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
             #name : () -> Text;
             #removeAuth : () -> Principal;
             #removeLiquidity : () -> (Principal, Principal, Nat, Nat, Nat, Principal, Int);
+            #removeLiquidityOneToken : () -> (Principal, Principal, Principal, Nat, Nat, Principal, Int);
             #retryDeposit : () -> Principal;
             #retryDepositTo : () -> (Principal, Principal, Nat);
             #setFeeForToken : () -> (Text, Nat);
@@ -3424,6 +3425,31 @@ shared (msg) actor class Swap(owner_ : Principal, swap_id : Principal) = this {
                 var lpAmount : Nat = d().2;
                 var amount0Min : Nat = d().3;
                 var amount1Min : Nat = d().4;
+                var to : Principal = d().5;
+                var deadline : Int = d().6;
+
+                if (Principal.isAnonymous(caller)) {
+                    return false
+                };
+
+                let tid0 : Text = Principal.toText(token0);
+                let tid1 : Text = Principal.toText(token1);
+                switch (_getPair(tid0, tid1)) {
+                    case (?p) {};
+                    case (_) { return false }
+                };
+                switch (_getlpToken(tid0, tid1)) {
+                    case (?t) {};
+                    case (_) { return false }
+                };
+                return true
+            };
+            case (#removeLiquidityOneToken d) {
+                var token : Principal = d().0;
+                var token0 : Principal = d().1;
+                var token1 : Principal = d().2;
+                var lpAmount : Nat = d().3;
+                var amountMin : Nat = d().4;
                 var to : Principal = d().5;
                 var deadline : Int = d().6;
 

@@ -43,6 +43,8 @@ function BorrowPopup({
   closeBorrowModal,
   // decimals,
   // tokenBalance,
+  isActive,
+  avaiBorrow,
   setUpdateUI,
 }) {
   const { borrowActor } = useAuth();
@@ -53,10 +55,31 @@ function BorrowPopup({
   const [showSelectToken, setShowSelectToken] = useState(false);
   const [dropDownDuration, setDropDownDuration] = useState(false);
   const [selectedOption, setSelectedOption] = useState();
+  const [quickInputAmountIn, setQuickInputAmountIn] = useState(0);
 
   const handleSelect = (value) => {
     setSelectedOption(value);
     setDropDownDuration(false);
+  };
+
+  const changeAmountIn = (percentage) => {
+    if (avaiBorrow && !isActive) {
+      let newAmountIn;
+
+      if (!selectToken) {
+        newAmountIn = (percentage * (avaiBorrow[1])) / 100;
+      } else {
+        newAmountIn = (percentage * (avaiBorrow[0])) / 100;
+      }
+
+      setAmountInput(newAmountIn);
+      setQuickInputAmountIn(percentage);
+    } else {
+      setAmountInput(0);
+    }
+    if (percentage === quickInputAmountIn) {
+      setQuickInputAmountIn(0);
+    }
   };
 
   const closeModal = () => {
@@ -67,20 +90,20 @@ function BorrowPopup({
   };
 
   const submitBorrow = async () => {
-    if (!amountInput || !selectedOption) {
+    if ((!amountInput || !selectedOption) && isActive) {
       alert('Missing input');
     } else {
       try {
         setLoading(true);
-        let tokenCanister = token1.canisterId;
-        if (!selectToken) {
-          tokenCanister = token0.canisterId;
+        let tokenCanister = token0.canisterId;
+        if (selectToken) {
+          tokenCanister = token1.canisterId;
         }
 
         const tx = await borrowActor.borrow(
-          amountInput * 10 ** 18,
+          amountInput - 10000, // prevent bigInt
           Principal.fromText(tokenCanister),
-          Number(selectedOption),
+          Number(selectedOption) * 60 * 60 * 24 * 1000000,
         );
         console.log(tx);
 
@@ -189,20 +212,32 @@ function BorrowPopup({
               type="number"
               className={styles.InputField}
               placeholder="0.0"
-              onChange={(e) => setAmountInput(e.target.value)}
-              value={amountInput}
+              onChange={(e) => setAmountInput(e.target.value * 10 ** 18)}
+              value={amountInput / 10 ** 18}
             />
-            <button type="button" className={styles.MaxButton}>
+            <button
+              type="button"
+              className={styles.MaxButton}
+              onClick={() => {
+                if (!selectToken && !isActive) {
+                  setAmountInput((avaiBorrow[1]));
+                } else if (selectToken && !isActive) {
+                  setAmountInput((avaiBorrow[0]));
+                } else {
+                  setAmountInput(0);
+                }
+              }}
+            >
               Max
             </button>
           </div>
         </div>
 
         <div className={styles.SelectContainer}>
-          <button type="button" className={styles.SelectOption}>25%</button>
-          <button type="button" className={styles.SelectOption}>50%</button>
-          <button type="button" className={styles.SelectOption}>75%</button>
-          <button type="button" className={styles.SelectOption}>100%</button>
+          <button className={styles.SelectOption} onClick={() => changeAmountIn(20)} style={{ backgroundColor: quickInputAmountIn === 20 && 'rgba(126, 135, 255, 1)', color: quickInputAmountIn === 20 && 'black' }} type="button">20%</button>
+          <button className={styles.SelectOption} onClick={() => changeAmountIn(50)} style={{ backgroundColor: quickInputAmountIn === 50 && 'rgba(126, 135, 255, 1)', color: quickInputAmountIn === 50 && 'black' }} type="button">50%</button>
+          <button className={styles.SelectOption} onClick={() => changeAmountIn(75)} style={{ backgroundColor: quickInputAmountIn === 75 && 'rgba(126, 135, 255, 1)', color: quickInputAmountIn === 75 && 'black' }} type="button">75%</button>
+          <button className={styles.SelectOption} onClick={() => changeAmountIn(100)} style={{ backgroundColor: quickInputAmountIn === 100 && 'rgba(126, 135, 255, 1)', color: quickInputAmountIn === 100 && 'black' }} type="button">100%</button>
         </div>
       </div>
 
@@ -284,12 +319,15 @@ BorrowPopup.propTypes = {
   closeBorrowModal: PropTypes.func.isRequired,
   // tokenBalance: PropTypes.arrayOf(PropTypes.number),
   // decimals: PropTypes.number,
+  isActive: PropTypes.bool,
+  avaiBorrow: PropTypes.arrayOf(PropTypes.any).isRequired,
   setUpdateUI: PropTypes.func.isRequired,
 };
 
 BorrowPopup.defaultProps = {
   // tokenBalance: [0, 0, 0],
   // decimals: 0,
+  isActive: false,
 };
 
 export default BorrowPopup;

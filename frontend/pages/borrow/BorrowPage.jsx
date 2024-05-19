@@ -41,21 +41,26 @@ function BorrowPage() {
     const balanceToken = async () => {
       if (principal) {
         try {
-          const tx = await
-          borrowActor.getTokenBalance(Principal.fromText(token0.canisterId), principal);
-          setBalanceToken0(Number(tx));
-          const tx2 = await
-          borrowActor.getTokenBalance(Principal.fromText(token1.canisterId), principal);
-          setBalanceToken1(Number(tx2));
-          const tx3 = await
-          borrowActor.getTokenBalance(Principal.fromText(aggregator.canisterId), principal);
-          setBalanceLpToken(Number(tx3));
-          const tx4 = await
-          borrowActor.getDepositIdPerUser(principal);
-          setBalanceDeposit(Number(tx4[0].amount));
+          const [
+            tx,
+            tx2,
+            tx3,
+            tx4,
+            tx5,
+          ] = await Promise.all([
+            borrowActor.getTokenBalance(Principal.fromText(token0.canisterId), principal),
+            borrowActor.getTokenBalance(Principal.fromText(token1.canisterId), principal),
+            borrowActor.getTokenBalance(Principal.fromText(aggregator.canisterId), principal),
+            borrowActor.getDepositIdPerUser(principal),
+            borrowActor.getHealthRaito(principal),
+          ]);
+
+          setBalanceToken0(parseFloat(tx));
+          setBalanceToken1(parseFloat(tx2));
+          setBalanceLpToken(parseFloat(tx3));
+          setBalanceDeposit(parseFloat(tx4[0].amount));
+
           setBorrowInfo(tx4[0]);
-          const tx5 = await
-          borrowActor.getHealthRaito(principal);
           setHealthRatio(Math.abs(100 - (Number(tx5) * 100)));
         } catch (error) {
           console.log(error);
@@ -69,11 +74,13 @@ function BorrowPage() {
     if (balanceLpToken) {
       const func = async () => {
         const tx = await
-        borrowActor.getAvaiableToBorrow(balanceDeposit);
-        setAvaiBorrow([Number(tx[0]), Number(tx[1])]);
+        borrowActor.getPairInfo(balanceDeposit);
+        setAvaiBorrow([parseFloat((tx[0] * BigInt(60)) / BigInt(100)),
+          parseFloat((tx[1] * BigInt(60)) / BigInt(100))]);
         const tx1 = await
-        borrowActor.getAvaiableToBorrow(balanceLpToken + balanceDeposit);
-        setAvaiBorrowTotal([Number(tx1[0]), Number(tx1[1])]);
+        borrowActor.getPairInfo(balanceLpToken + balanceDeposit);
+        setAvaiBorrowTotal([parseFloat((tx1[0] * BigInt(60)) / BigInt(100)),
+          parseFloat((tx1[1] * BigInt(60)) / BigInt(100))]);
       };
       func();
     }
@@ -161,6 +168,7 @@ function BorrowPage() {
             healthRatio={healthRatio}
             avaiBorrow={avaiBorrow}
             avaiBorrowTotal={avaiBorrowTotal}
+            isActive={borrowInfo && borrowInfo.isUsing}
           />
           {/* <Borrow />
           <Borrow />
@@ -173,6 +181,8 @@ function BorrowPage() {
         closeBorrowModal={closeBorrowModal}
         decimals={18}
         tokenBalance={[balanceToken0, balanceToken1, balanceLpToken]}
+        avaiBorrow={avaiBorrow}
+        isActive={borrowInfo && borrowInfo.isUsing}
         setUpdateUI={setUpdateUI}
       />
       <WithdrawPopup
@@ -180,6 +190,7 @@ function BorrowPage() {
         closeWithdrawModal={closeWithdrawModal}
         decimals={18}
         tokenBalance={balanceDeposit}
+        isActive={borrowInfo && borrowInfo.isUsing}
         setUpdateUI={setUpdateUI}
       />
       <SupplyPopup
@@ -187,6 +198,7 @@ function BorrowPage() {
         closeSupplyModal={closeSupplyModal}
         decimals={18}
         tokenBalance={[balanceToken0, balanceToken1, balanceLpToken]}
+        isActive={borrowInfo && borrowInfo.isUsing}
         setUpdateUI={setUpdateUI}
       />
       <RepayPopup

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Principal } from '@dfinity/principal';
 import { toast } from 'react-toastify';
+import { Principal } from '@dfinity/principal';
 import {
   WithdrawIcon,
 } from '../Utils';
@@ -9,33 +9,38 @@ import * as token0 from '../../../../../src/declarations/token0';
 import * as token1 from '../../../../../src/declarations/token1';
 import { useAuth } from '../../../../hooks/use-auth-client';
 
-import WithdrawImg from '../../../../assets/withdraw.png';
 import ckBTC from '../../../../assets/ckBTC.png';
 import ckETH from '../../../../assets/ckETH.png';
+import * as aggregator from '../../../../../src/declarations/aggregator';
 
 function Withdraw() {
   const {
-    swapActor, token0Actor, token1Actor, principal,
+    swapActor, aggregatorActor, token0Actor, token1Actor, principal,
   } = useAuth();
 
   const [loading, setLoading] = useState(false);
   const [tokenList, setTokenList] = useState([]);
   const [tokenBalance0, setTokenBalance0] = useState(0);
   const [tokenBalance1, setTokenBalance1] = useState(0);
+  const [lpTokenBalance, setLpTokenBalance] = useState(0);
   const [decimals0, setDecimals0] = useState(0);
   const [decimals1, setDecimals1] = useState(0);
   const [amountInput, setAmountInput] = useState(0);
   const [amountInput0, setAmountInput0] = useState(0);
   const [amountInput1, setAmountInput1] = useState(0);
+  const [amountLPInput, setAmountLPInput] = useState(0);
   const [tokenPrincipal, setTokenPrincipal] = useState('');
   const [quickInputAmountIn, setQuickInputAmountIn] = useState(0);
 
   const changeAmountIn = (percentage) => {
-    if (tokenBalance0 && tokenBalance1) {
+    if (tokenBalance0 && tokenBalance1 && lpTokenBalance) {
       const newAmountIn0 = (percentage * (Number(tokenBalance0) / 10 ** 18)) / 100;
       const newAmountIn1 = (percentage * (Number(tokenBalance1) / 10 ** 18)) / 100;
+      const newLpTokenBalance = (BigInt(percentage) * lpTokenBalance) / BigInt(100);
+
       setAmountInput0(newAmountIn0);
       setAmountInput1(newAmountIn1);
+      setAmountLPInput(newLpTokenBalance);
       setAmountInput(newAmountIn0 + newAmountIn1);
       setQuickInputAmountIn(percentage);
     }
@@ -48,7 +53,33 @@ function Withdraw() {
     try {
       setLoading(true);
 
-      // Deposit tokens
+      // remove liquidity
+      const record = {
+        fee: [],
+        memo: [],
+        from_subaccount: [],
+        created_at_time: [],
+        amount: amountLPInput,
+        expected_allowance: [],
+        expires_at: [],
+        spender: Principal.fromText(aggregator.canisterId),
+      };
+
+      await aggregatorActor.icrc2_approve(record);
+
+      const timestamp = Math.floor(new Date().getTime() * 10000000000);
+
+      const res = await aggregatorActor.removeLP(
+        Principal.fromText(token0.canisterId),
+        Principal.fromText(token1.canisterId),
+        amountLPInput,
+        0,
+        0,
+        principal,
+        timestamp,
+      );
+
+      // Withdraw tokens
       await swapActor.withdraw(
         Principal.fromText(token0.canisterId),
         amountInput0 * 10 ** 18,
@@ -59,13 +90,19 @@ function Withdraw() {
         amountInput1 * 10 ** 18,
       );
 
+      setLoading(false);
+
+      if (res.trim().toLowerCase() === 'ok') {
+        toast.success('Withdraw successfully');
+      } else {
+        console.log('RES: ', res);
+        toast.error('Withdraw not successfully');
+      }
+
       getBalancesAndDecimals();
       setQuickInputAmountIn(0);
 
       setLoading(false);
-
-      // Check results
-      toast.success('Withdraw successfully');
     } catch (e) {
       console.log(e);
       toast.error('Withdraw error');
@@ -88,14 +125,23 @@ function Withdraw() {
   const getBalancesAndDecimals = async () => {
     if (tokenPrincipal && principal) {
       try {
-        const res = await swapActor.getUserBalances(principal);
-        const balance0 = res.find((b) => b[0] === token0.canisterId);
-        const balance1 = res.find((b) => b[0] === token1.canisterId);
+        const balLP = await aggregatorActor.icrc1_balance_of({
+          owner: principal,
+          subaccount: [],
+        });
+        const pair = await swapActor.getPair(
+          Principal.fromText(token0.canisterId),
+          Principal.fromText(token1.canisterId),
+        );
+
+        const balance0 = (balLP * pair[0].reserve1) / pair[0].totalSupply;
+        const balance1 = (balLP * pair[0].reserve0) / pair[0].totalSupply;
         const dec0 = await token0Actor.icrc1_decimals();
         const dec1 = await token1Actor.icrc1_decimals();
 
-        setTokenBalance0(Number(balance0[1]));
-        setTokenBalance1(Number(balance1[1]));
+        setTokenBalance0(Number(balance0));
+        setTokenBalance1(Number(balance1));
+        setLpTokenBalance(balLP);
         setDecimals0(Number(dec0));
         setDecimals1(Number(dec1));
       } catch (error) {
@@ -126,7 +172,7 @@ function Withdraw() {
       </div> */}
       <div className={styles.Deposit}>
         <div className={styles.TitleContainer}>
-          <h2 className={styles.Title}>{amountInput.toFixed(6)}</h2>
+          <h2 className={styles.Title}>{(amountInput).toFixed(6)}</h2>
         </div>
 
         <div>
@@ -140,8 +186,7 @@ function Withdraw() {
                 {(tokenBalance0 || tokenBalance1) && (decimals0 || decimals1)
                 && (
                   <span>
-                    {((tokenBalance0 / 10 ** decimals0)
-                    + (tokenBalance1 / 10 ** decimals1)).toFixed(6)}
+                    {((tokenBalance0 + tokenBalance1) / 10 ** 18).toFixed(6)}
                   </span>
                 )}
               </div>

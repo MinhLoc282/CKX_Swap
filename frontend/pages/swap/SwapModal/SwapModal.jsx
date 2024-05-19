@@ -182,7 +182,7 @@ function SwapModal({
 
       await swapActor.deposit(
         Principal.fromText(tempFormvalue.token0),
-        tempFormvalue.amountIn * 10 ** 18,
+        tempFormvalue.amountIn,
       );
 
       // console.log('CHECK: ', tempFormvalue.amountIn, ' ', AmountOutMin, '', minSlippage);
@@ -198,7 +198,7 @@ function SwapModal({
 
       await swapActor.withdraw(
         Principal.fromText(tempFormvalue.token1),
-        tempFormvalue.amountOutMin * 10 ** 18,
+        tempFormvalue.amountOutMin,
       );
 
       console.log('token0: ', Principal.fromText(tempFormvalue.token0).toString());

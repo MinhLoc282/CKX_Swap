@@ -32,9 +32,13 @@ function AddLiquidityModal({
   isAddLiquidityModalOpen,
   closeAddLiquidityModal,
   formValues,
+  validation,
+  setAmount0Desired,
+  setAmount1Desired,
   price,
   priceMin,
   priceMax,
+  handleGetUserBalances,
 }) {
   const {
     swapActor, token0Actor, token1Actor,
@@ -257,7 +261,7 @@ function AddLiquidityModal({
         owner: principal,
         subaccount: [],
       });
-      const t1b = await token0Actor.icrc1_balance_of({
+      const t1b = await token1Actor.icrc1_balance_of({
         owner: principal,
         subaccount: [],
       });
@@ -282,10 +286,10 @@ function AddLiquidityModal({
         spender: Principal.fromText(aggregator.canisterId),
       };
 
-      if (formValues.token0 === pair[0].token0) {
-        await token0Actor.icrc2_approve(record);
-        await token1Actor.icrc2_approve(record1);
+      await token0Actor.icrc2_approve(record);
+      await token1Actor.icrc2_approve(record1);
 
+      if (formValues.token0 === pair[0].token0) {
         const timestamp = Math.floor(new Date().getTime() * 10000000000);
 
         res = await aggregatorActor.addLP(
@@ -300,9 +304,6 @@ function AddLiquidityModal({
 
         console.log(res);
       } else {
-        await token1Actor.icrc2_approve(record);
-        await token0Actor.icrc2_approve(record1);
-
         const timestamp = Math.floor(new Date().getTime() * 10000000000);
 
         res = await aggregatorActor.addLP(
@@ -327,6 +328,11 @@ function AddLiquidityModal({
         console.log('RES: ', res);
         toast.error('Liquidity not added successfully');
       }
+      handleGetUserBalances();
+      setAmount0Desired(0);
+      setAmount1Desired(0);
+      validation.setFieldValue('amount0Desired', 0);
+      validation.setFieldValue('amount1Desired', 0);
     } catch (e) {
       console.log(e);
       toast.error('Liquidity not added successfully');
@@ -439,9 +445,23 @@ AddLiquidityModal.propTypes = {
     amount0Desired: PropTypes.number,
     amount1Desired: PropTypes.number,
   }).isRequired,
+  validation: PropTypes.shape({
+    initialValues: PropTypes.shape({
+      token0: PropTypes.string.isRequired,
+      token1: PropTypes.string.isRequired,
+      amount0Desired: PropTypes.number.isRequired,
+      amount1Desired: PropTypes.number.isRequired,
+    }).isRequired,
+    setFieldValue: PropTypes.func.isRequired,
+    validationSchema: PropTypes.object.isRequired,
+    onSubmit: PropTypes.func.isRequired,
+  }).isRequired,
+  setAmount0Desired: PropTypes.func.isRequired,
+  setAmount1Desired: PropTypes.func.isRequired,
   price: PropTypes.number,
   priceMin: PropTypes.number,
   priceMax: PropTypes.number,
+  handleGetUserBalances: PropTypes.func.isRequired,
 };
 
 AddLiquidityModal.defaultProps = {

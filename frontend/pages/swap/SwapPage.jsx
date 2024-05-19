@@ -14,6 +14,8 @@ import SettingModal from './SettingModal/SettingModal';
 
 import ckBTC from '../../assets/ckBTC.png';
 import ckETH from '../../assets/ckETH.png';
+import * as token0 from '../../../src/declarations/token0';
+import * as token1 from '../../../src/declarations/token1';
 
 function SwapPage() {
   const validation = useFormik({
@@ -37,7 +39,7 @@ function SwapPage() {
       openSwapModal();
     },
   });
-  const { swapActor, principal } = useAuth();
+  const { swapActor, principal, identity } = useAuth();
 
   const [slippage, setSlippage] = useState('');
   const [price, setPrice] = useState();
@@ -121,17 +123,33 @@ function SwapPage() {
 
   useEffect(() => {
     const handleGetUserBalanceToken0 = async () => {
-      const res = await swapActor.getUserBalances(principal);
-      const token0Balance = res.find((balance) => balance[0] === validation.values.token0);
+      const token0ActorForSelectedToken = token0.createActor(validation.values.token0, {
+        agentOptions: {
+          identity,
+        },
+      });
 
-      setUserBalanceToken0([token0Balance[1]]);
+      const token0Balance = await token0ActorForSelectedToken.icrc1_balance_of({
+        owner: principal,
+        subaccount: [],
+      });
+
+      setUserBalanceToken0(token0Balance);
     };
 
     const handleGetUserBalanceToken1 = async () => {
-      const res = await swapActor.getUserBalances(principal);
-      const token1Balance = res.find((balance) => balance[0] === validation.values.token1);
+      const token1ActorForSelectedToken = token1.createActor(validation.values.token1, {
+        agentOptions: {
+          identity,
+        },
+      });
 
-      setUserBalanceToken1([token1Balance[1]]);
+      const token1Balance = await token1ActorForSelectedToken.icrc1_balance_of({
+        owner: principal,
+        subaccount: [],
+      });
+
+      setUserBalanceToken1(token1Balance);
     };
 
     if (swapActor && principal && validation.values.token0) {
@@ -215,8 +233,8 @@ function SwapPage() {
   };
 
   const changeAmountIn = (percentage) => {
-    if (userBalanceToken0[0]) {
-      const newAmountIn = (percentage * (Number(userBalanceToken0[0]) / 10 ** 18)) / 100;
+    if (userBalanceToken0) {
+      const newAmountIn = (percentage * (Number(userBalanceToken0) / 10 ** 18)) / 100;
       validation.setFieldValue('amountIn', Math.floor(newAmountIn));
       setQuickInputAmountIn(percentage);
     }
@@ -281,8 +299,8 @@ function SwapPage() {
                 <p>
                   Balance:
                   {' '}
-                  {userBalanceToken0[0]
-                    ? Math.round((Number(userBalanceToken0[0]) / 10 ** 18) * 1000) / 1000 : 0}
+                  {userBalanceToken0
+                    ? Math.round((Number(userBalanceToken0) / 10 ** 18) * 1000) / 1000 : 0}
                 </p>
                 <div className={styles.quickInputButton}>
                   <button onClick={() => changeAmountIn(20)} style={{ backgroundColor: quickInputAmountIn === 20 ? 'rgba(126, 135, 255, 1)' : 'rgba(24, 25, 33, 1)' }} type="button">20%</button>
@@ -322,8 +340,8 @@ function SwapPage() {
                 <p>
                   Balance:
                   {' '}
-                  {userBalanceToken1[0]
-                    ? Math.round((Number(userBalanceToken1[0]) / 10 ** 18) * 1000) / 1000 : 0}
+                  {userBalanceToken1
+                    ? Math.round((Number(userBalanceToken1) / 10 ** 18) * 1000) / 1000 : 0}
                 </p>
               </div>
               {(principal && selectedToken0Name && selectedToken1Name

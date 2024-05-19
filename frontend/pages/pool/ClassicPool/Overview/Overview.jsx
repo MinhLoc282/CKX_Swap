@@ -69,15 +69,16 @@ function Overview() {
             {pairInfo && pairInfo.reserve0 > 0 && pairInfo.reserve1 > 0 ? (
               pairInfo.reserve1 > pairInfo.reserve0 ? (
                 <div style={{ marginTop: '18px', display: 'flex', gap: '8px' }}>
-                  <img src={ckBTC} width={32} alt="" />
-                  <div style={{ marginTop: '8px' }}>
-                    1 ckBTC =
-                  </div>
                   <img src={ckETH} width={32} alt="" />
+                  <div style={{ marginTop: '8px' }}>
+                    1 ckETH =
+                  </div>
+
+                  <img src={ckBTC} width={32} alt="" />
                   <div style={{ marginTop: '8px' }}>
                     {(parseFloat(pairInfo.reserve1) / parseFloat(pairInfo.reserve0)).toFixed(5)}
                     {' '}
-                    ckETH
+                    ckBTC
                   </div>
                 </div>
               ) : (
@@ -86,49 +87,67 @@ function Overview() {
                   <div style={{ marginTop: '8px' }}>
                     {(parseFloat(pairInfo.reserve0) / parseFloat(pairInfo.reserve1)).toFixed(5)}
                     {' '}
-                    ckBTC =
+                    ckETH =
                   </div>
+
                   <img src={ckBTC} width={32} alt="" />
                   <div style={{ marginTop: '8px' }}>
-                    1 ckETH
+                    1 ckBTC
                   </div>
                 </div>
               )
             ) : (
               <div style={{ marginTop: '18px', display: 'flex', gap: '8px' }}>
-                <img src={ckBTC} width={32} alt="" />
-                <div style={{ marginTop: '8px' }}>0 ckBTC =</div>
                 <img src={ckETH} width={32} alt="" />
-                <div style={{ marginTop: '8px' }}>0 ckETH</div>
+                <div style={{ marginTop: '8px' }}>0 ckETH =</div>
+
+                <img src={ckBTC} width={32} alt="" />
+                <div style={{ marginTop: '8px' }}>0 ckBTC</div>
               </div>
             )}
           </div>
 
           <div className={styles.RightFirstRowElement}>
             <div className={styles.RightTitle}>Assets in Pool</div>
-            <div style={{ marginTop: '18px' }}>
-              <div style={{ display: 'flex', gap: '10px' }}>
-                <FiftyPercent />
-                <img src={ckBTC} width={24} height={24} alt="" />
-                <div style={{ alignSelf: 'center' }}>
-                  {pairInfo ? Number(pairInfo.reserve0 / BigInt(10 ** 18)) : '-'}
-                  {' '}
-                  BTC
+            <div style={{ display: 'flex', gap: '50px' }}>
+              <div style={{ marginTop: '18px' }}>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <FiftyPercent percentage={pairInfo && pairInfo.reserve0 && pairInfo.reserve1
+                    ? ((Number(pairInfo.reserve0)
+                    / (Number(pairInfo.reserve0) + Number(pairInfo.reserve1))) * 100).toFixed(2)
+                    : 0}
+                  />
+                  <img src={ckETH} width={24} height={24} alt="" />
+                  <div style={{ alignSelf: 'center' }}>
+                    {pairInfo ? parseFloat(Number(pairInfo.reserve0) / 10 ** 18).toFixed(2) : '-'}
+                    {' '}
+                    ETH
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: '10px', marginTop: '12px' }}>
+                  <FiftyPercent percentage={pairInfo
+                    && pairInfo.reserve0 && pairInfo.reserve1
+                    ? ((Number(pairInfo.reserve1)
+                    / (Number(pairInfo.reserve0) + Number(pairInfo.reserve1))) * 100).toFixed(2)
+                    : 0}
+                  />
+                  <img src={ckBTC} width={24} height={24} alt="" />
+                  <div style={{ alignSelf: 'center' }}>
+                    {pairInfo ? parseFloat(Number(pairInfo.reserve1) / 10 ** 18).toFixed(2) : '-'}
+                    {' '}
+                    BTC
+                  </div>
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: '10px', marginTop: '12px' }}>
-                <FiftyPercent />
-                <img src={ckETH} width={24} height={24} alt="" />
-                <div style={{ alignSelf: 'center' }}>
-                  {pairInfo ? Number(pairInfo.reserve1 / BigInt(10 ** 18)) : '-'}
-                  {' '}
-                  ETH
-                </div>
+
+              <div>
+                <div className={styles.RightTitle}>TOTAL APR</div>
+                <div style={{ marginTop: '8px', fontSize: '18px' }}>7.36%</div>
               </div>
             </div>
           </div>
         </div>
-        <div className={styles.RightSecondRow}>
+        {/* <div className={styles.RightSecondRow}>
           <div>
             <div className={styles.RightTitle}>TVL</div>
             <div style={{ marginTop: '8px', fontSize: '18px' }}>$34,006,901.38</div>
@@ -145,9 +164,9 @@ function Overview() {
             <div className={styles.RightTitle}>FEE (24H)</div>
             <div style={{ marginTop: '8px', fontSize: '18px' }}>$9,814.5</div>
           </div>
-        </div>
+        </div> */}
       </div>
-      <div className={styles.LpReward}>
+      {/* <div className={styles.LpReward}>
         <div style={{ display: 'flex', gap: '8px' }}>
           <div><Lightning /></div>
           <div>LP REWARDS</div>
@@ -169,7 +188,7 @@ function Overview() {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }
