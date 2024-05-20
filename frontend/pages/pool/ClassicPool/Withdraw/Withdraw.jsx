@@ -172,7 +172,7 @@ function Withdraw() {
       </div> */}
       <div className={styles.Deposit}>
         <div className={styles.TitleContainer}>
-          <h2 className={styles.Title}>{(amountInput).toFixed(6)}</h2>
+          <h2 className={styles.Title}>{(parseFloat(amountLPInput) / 10 ** 18).toFixed(6)}</h2>
         </div>
 
         <div>
@@ -186,7 +186,7 @@ function Withdraw() {
                 {(tokenBalance0 || tokenBalance1) && (decimals0 || decimals1)
                 && (
                   <span>
-                    {((tokenBalance0 + tokenBalance1) / 10 ** 18).toFixed(6)}
+                    {(parseFloat(amountLPInput) / 10 ** 18).toFixed(6)}
                   </span>
                 )}
               </div>

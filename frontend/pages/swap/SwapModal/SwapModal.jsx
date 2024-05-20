@@ -40,7 +40,7 @@ function SwapModal({
   clearAll,
 }) {
   const {
-    principal, swapActor, identity,
+    principal, swapActor, identity, token0Actor, token1Actor,
   } = useAuth();
 
   const [tokens, setTokens] = useState([]);
@@ -196,9 +196,24 @@ function SwapModal({
         timestamp,
       );
 
+      // await swapActor.withdraw(
+      //   Principal.fromText(tempFormvalue.token1),
+      //   tempFormvalue.amountOutMin,
+      // );
+
+      let balance;
+
+      if (tempFormvalue.token1 === token0.canisterId) {
+        const resUserBal = await swapActor.getUserBalances(principal);
+        balance = resUserBal.find((b) => b[0] === tempFormvalue.token1);
+      } else if (tempFormvalue.token1 === token1.canisterId) {
+        const resUserBal = await swapActor.getUserBalances(principal);
+        balance = resUserBal.find((b) => b[0] === tempFormvalue.token1);
+      }
+
       await swapActor.withdraw(
         Principal.fromText(tempFormvalue.token1),
-        tempFormvalue.amountOutMin,
+        balance[1],
       );
 
       console.log('token0: ', Principal.fromText(tempFormvalue.token0).toString());

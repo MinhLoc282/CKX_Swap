@@ -248,14 +248,14 @@ function LendPage() {
                 </div>
               </div>
               <div style={{ textAlign: 'right' }}>
-                <div style={{ lineHeight: '24px', fontSize: '14px' }}>$0.29</div>
+                <div style={{ lineHeight: '24px', fontSize: '14px' }}>$NaN</div>
                 {interest ? <div style={{ fontSize: '24px', color: 'rgba(204, 204, 204, 1)', marginTop: '6px' }}>{(interest / 10 ** decimals).toFixed(6)}</div>
                   : <div style={{ fontSize: '24px', color: 'rgba(204, 204, 204, 1)', marginTop: '6px' }}>0</div>}
               </div>
             </div>
             <div className={styles.ClaimBottom}>
               <div className={styles.TextTitle}>INTEREST APY (24HRS)</div>
-              <div className={styles.TextTContent}>1.7%</div>
+              <div className={styles.TextTContent}>NaN%</div>
             </div>
             <button type="button" className={styles.ButtonContainer} onClick={openClaim}>
               Claim

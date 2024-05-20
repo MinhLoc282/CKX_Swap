@@ -142,7 +142,7 @@ function Overview() {
 
               <div>
                 <div className={styles.RightTitle}>TOTAL APR</div>
-                <div style={{ marginTop: '8px', fontSize: '18px' }}>7.36%</div>
+                <div style={{ marginTop: '8px', fontSize: '18px' }}>NaN%</div>
               </div>
             </div>
           </div>

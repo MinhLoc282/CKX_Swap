@@ -109,7 +109,7 @@ function PoolPage() {
           </div>
           <div className={styles.GridAPR}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <div style={{ marginTop: '4px' }}>9.2%</div>
+              <div style={{ marginTop: '4px' }}>NaN%</div>
               <Link to="/pool/classic">
                 <ArrowRight />
               </Link>

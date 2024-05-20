@@ -39,7 +39,7 @@ function Borrow(
             marginTop: '32px', paddingTop: '32px', borderTop: '1px solid rgba(44, 45, 59, 1)', color: '#83BD67',
           }}
           >
-            +50%
+            NaN%
           </div>
         </div>
         <div className={styles.TextCenter}>
@@ -51,7 +51,7 @@ function Borrow(
             marginTop: '32px', marginBottom: '32px', paddingTop: '32px', borderTop: '1px solid rgba(44, 45, 59, 1)', color: '#BD6767',
           }}
           >
-            -5%
+            NaN%
           </div>
         </div>
       </div>

@@ -229,8 +229,22 @@ shared (msg) actor class Borrow(
     public shared (msg) func borrow(
         borrowValue : Nat,
         tokenId_canister_borrow : Principal,
-        duration: Nat,
+        durationIndex: Nat,
     ) : async Text {
+        let durations : [Nat] = [
+            86400000000, // 1 day
+            259200000000, // 3 days
+            604800000000, // 7 days
+            1209600000000, // 14 days
+            2592000000000, // 1 month
+            7776000000000, // 3 months
+            15552000000000, // 6 months
+            23328000000000, // 9 months
+            31104000000000, // 12 months
+            38880000000000, // 15 months
+            46656000000000, // 18 months
+        ];
+
         let maybeArray = depositInfoLpToken.get(msg.caller);
 
         switch (maybeArray) {
@@ -264,6 +278,13 @@ shared (msg) actor class Borrow(
                     }
                 } else {
                     return "Invalid Token Canister"
+                };
+
+                var duration : Nat = 0;
+                if (durationIndex < durations.size()) {
+                    duration := durations[durationIndex];
+                } else {
+                    return "Invalid duration";
                 };
 
                 var tx = await lend(borrowValue, msg.caller, tokenId_canister_borrow, lpValue, msg.caller, duration);
@@ -352,9 +373,9 @@ shared (msg) actor class Borrow(
                             case (?r) {
                                 var newDepInform : DepositType = {
                                     amount = r.amount;
-                                    interest = r.interest + interest ;
+                                    interest = r.interest;
                                     startTime = r.startTime;
-                                    duration = r.duration;
+                                    duration = 0;
                                     isActive = true;
                                     tokenIdBorrow = r.tokenIdBorrow;
                                     borrow = 0;
@@ -382,7 +403,7 @@ shared (msg) actor class Borrow(
                                     amount = lpValue;
                                     interest = interest;
                                     startTime = Time.now();
-                                    duration = r.duration;
+                                    duration = 0;
                                     isActive = true;
                                     tokenIdBorrow = r.tokenIdBorrow;
                                     borrow = 0;
@@ -1011,7 +1032,7 @@ shared (msg) actor class Borrow(
                                                       amount = 0;
                                                       startTime = r.startTime;
                                                       duration = 0;
-                                                      interest = 0;
+                                                      interest = r.interest;
                                                       isActive = false;
                                                       tokenIdBorrow = r.tokenIdBorrow;
                                                       borrow = 0;

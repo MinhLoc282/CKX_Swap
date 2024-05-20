@@ -131,27 +131,27 @@ function BorrowPage() {
             <div className={styles.HeaderTitle}>TOTAL SUPPLIED</div>
             <div className={styles.Headerdiv}>
               <img src={ckBTC} width={24} height={24} alt="" />
-              <div className={styles.MTop}>50.2 ckBTC</div>
+              <div className={styles.MTop}>NaN ckBTC</div>
             </div>
             <div className={styles.Headerdiv}>
               <img src={ckETH} width={24} height={24} alt="" />
-              <div className={styles.MTop}>24 ckETH</div>
+              <div className={styles.MTop}>NaN ckETH</div>
             </div>
           </div>
           <div className={styles.HeaderMiddle}>
             <div className={styles.HeaderTitle}>AVAILABLE FOR BORROWING</div>
             <div className={styles.Headerdiv}>
               <img src={ckBTC} width={24} height={24} alt="" />
-              <div className={styles.MTop}>50.2 ckBTC</div>
+              <div className={styles.MTop}>NaN ckBTC</div>
             </div>
             <div className={styles.Headerdiv}>
               <img src={ckETH} width={24} height={24} alt="" />
-              <div className={styles.MTop}>24 ckETH</div>
+              <div className={styles.MTop}>NaN ckETH</div>
             </div>
           </div>
           <div className={styles.HeaderRight}>
             <div className={styles.HeaderTitle}>AVERAGE BORROWING RATE (24HRS)</div>
-            <div style={{ marginTop: '6px' }}>4.5%</div>
+            <div style={{ marginTop: '6px' }}>NaN%</div>
           </div>
         </div>
         <div className={styles.BorrowDiv}>

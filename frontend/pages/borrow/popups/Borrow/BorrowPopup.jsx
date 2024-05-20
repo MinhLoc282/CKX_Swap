@@ -38,6 +38,20 @@ const customStyles = {
   },
 };
 
+const durations = [
+  '1 day', // 1 day
+  '3 days', // 3 days
+  '7 days', // 7 days
+  '14 days', // 14 days
+  '1 month', // 1 month
+  '3 months', // 3 months
+  '6 months', // 6 months
+  '9 months', // 9 months
+  '12 months', // 12 months
+  '15 months', // 15 months
+  '18 months', // 18 months
+];
+
 function BorrowPopup({
   isBorrowModalOpen,
   closeBorrowModal,
@@ -103,7 +117,7 @@ function BorrowPopup({
         const tx = await borrowActor.borrow(
           amountInput - 10000, // prevent bigInt
           Principal.fromText(tokenCanister),
-          Number(selectedOption) * 60 * 60 * 24 * 1000000,
+          Number(selectedOption),
         );
         console.log(tx);
 
@@ -154,18 +168,18 @@ function BorrowPopup({
 
       <div className={styles.Label}>
         <span className={styles.Label1}>
-          0.02
+          NaN
         </span>
         &nbsp;
         {selectToken ? 'ckETH LP token' : 'ckBTC LP token'}
       </div>
 
       <div className={styles.Label}>
-        $ 5,000
+        $ NaN
       </div>
 
       <div className={styles.Label}>
-        Borrowing Limit is 0.2
+        Borrowing Limit is NaN
         {' '}
         {selectToken ? 'ckETH' : 'ckBTC'}
       </div>
@@ -259,8 +273,7 @@ function BorrowPopup({
               onClick={() => setDropDownDuration(!dropDownDuration)}
             >
               <div style={{ position: 'absolute', left: '48px' }}>
-                {selectedOption && (selectedOption <= 30 ? `${selectedOption} days` : `${selectedOption / 30} months`)}
-                {!selectedOption && ''}
+                {durations[selectedOption]}
               </div>
               <div>
                 <svg
@@ -279,7 +292,7 @@ function BorrowPopup({
                 className={styles.MaxButton}
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleSelect(540);
+                  handleSelect(10);
                 }}
               >
                 Max
@@ -290,17 +303,17 @@ function BorrowPopup({
           {dropDownDuration
             && (
               <div className={styles.DropDownElements}>
-                <button onClick={() => handleSelect(1)} type="button"><p>1 day</p></button>
-                <button onClick={() => handleSelect(3)} type="button"><p>3 days</p></button>
-                <button onClick={() => handleSelect(7)} type="button"><p>7 days</p></button>
-                <button onClick={() => handleSelect(14)} type="button"><p>14 days</p></button>
-                <button onClick={() => handleSelect(30)} type="button"><p>1 month</p></button>
-                <button onClick={() => handleSelect(90)} type="button"><p>3 months</p></button>
-                <button onClick={() => handleSelect(180)} type="button"><p>6 months</p></button>
-                <button onClick={() => handleSelect(270)} type="button"><p>9 months</p></button>
-                <button onClick={() => handleSelect(360)} type="button"><p>12 months</p></button>
-                <button onClick={() => handleSelect(450)} type="button"><p>15 months</p></button>
-                <button onClick={() => handleSelect(540)} type="button"><p>18 months</p></button>
+                <button onClick={() => handleSelect(0)} type="button"><p>1 day</p></button>
+                <button onClick={() => handleSelect(1)} type="button"><p>3 days</p></button>
+                <button onClick={() => handleSelect(2)} type="button"><p>7 days</p></button>
+                <button onClick={() => handleSelect(3)} type="button"><p>14 days</p></button>
+                <button onClick={() => handleSelect(4)} type="button"><p>1 month</p></button>
+                <button onClick={() => handleSelect(5)} type="button"><p>3 months</p></button>
+                <button onClick={() => handleSelect(6)} type="button"><p>6 months</p></button>
+                <button onClick={() => handleSelect(7)} type="button"><p>9 months</p></button>
+                <button onClick={() => handleSelect(8)} type="button"><p>12 months</p></button>
+                <button onClick={() => handleSelect(9)} type="button"><p>15 months</p></button>
+                <button onClick={() => handleSelect(10)} type="button"><p>18 months</p></button>
               </div>
             )}
         </div>
