@@ -11,6 +11,7 @@ import Borrow from '../../components/BorrowDiv/Borrow';
 import * as token0 from '../../../src/declarations/token0';
 import * as token1 from '../../../src/declarations/token1';
 import * as aggregator from '../../../src/declarations/aggregator';
+import * as borrow from '../../../src/declarations/borrow';
 
 import { useAuth } from '../../hooks/use-auth-client';
 
@@ -27,6 +28,8 @@ function BorrowPage() {
   const [balanceToken1, setBalanceToken1] = useState(0);
   const [balanceLpToken, setBalanceLpToken] = useState(0);
   const [balanceDeposit, setBalanceDeposit] = useState(0);
+  const [balanceBorrowBTC, setBalanceBorrowBTC] = useState(0);
+  const [balanceBorrowETH, setBalanceBorrowETH] = useState(0);
   const [borrowInfo, setBorrowInfo] = useState();
 
   const [healthRatio, setHealthRatio] = useState(0);
@@ -35,7 +38,9 @@ function BorrowPage() {
 
   const [updateUI, setUpdateUI] = useState(false);
 
-  const { principal, borrowActor } = useAuth();
+  const {
+    principal, borrowActor, token0Actor, token1Actor,
+  } = useAuth();
 
   useEffect(() => {
     const balanceToken = async () => {
@@ -47,18 +52,30 @@ function BorrowPage() {
             tx3,
             tx4,
             tx5,
+            tx6,
+            tx7,
           ] = await Promise.all([
             borrowActor.getTokenBalance(Principal.fromText(token0.canisterId), principal),
             borrowActor.getTokenBalance(Principal.fromText(token1.canisterId), principal),
             borrowActor.getTokenBalance(Principal.fromText(aggregator.canisterId), principal),
             borrowActor.getDepositIdPerUser(principal),
             borrowActor.getHealthRaito(principal),
+            token0Actor.icrc1_balance_of({
+              owner: Principal.fromText(borrow.canisterId),
+              subaccount: [],
+            }),
+            token1Actor.icrc1_balance_of({
+              owner: Principal.fromText(borrow.canisterId),
+              subaccount: [],
+            }),
           ]);
 
           setBalanceToken0(parseFloat(tx));
           setBalanceToken1(parseFloat(tx2));
           setBalanceLpToken(parseFloat(tx3));
           setBalanceDeposit(parseFloat(tx4[0].amount));
+          setBalanceBorrowBTC(tx6);
+          setBalanceBorrowETH(tx7);
 
           setBorrowInfo(tx4[0]);
           setHealthRatio(Math.abs(100 - (Number(tx5) * 100)));
@@ -75,8 +92,16 @@ function BorrowPage() {
       const func = async () => {
         const tx = await
         borrowActor.getPairInfo(balanceDeposit);
-        setAvaiBorrow([parseFloat((tx[0] * BigInt(60)) / BigInt(100)),
-          parseFloat((tx[1] * BigInt(60)) / BigInt(100))]);
+        setAvaiBorrow([
+          Math.min(
+            parseFloat((tx[0] * BigInt(60)) / BigInt(100)),
+            parseFloat(balanceBorrowBTC),
+          ),
+          Math.min(
+            parseFloat((tx[1] * BigInt(60)) / BigInt(100)),
+            parseFloat(balanceBorrowETH),
+          ),
+        ]);
         const tx1 = await
         borrowActor.getPairInfo(balanceLpToken + balanceDeposit);
         setAvaiBorrowTotal([parseFloat((tx1[0] * BigInt(60)) / BigInt(100)),
@@ -84,7 +109,7 @@ function BorrowPage() {
       };
       func();
     }
-  }, [balanceDeposit, balanceLpToken, principal, updateUI]);
+  }, [balanceDeposit, balanceLpToken, principal, updateUI, balanceBorrowBTC, balanceBorrowETH]);
 
   const openRepayModal = () => {
     setIsRepayModalOpen(true);
@@ -142,11 +167,19 @@ function BorrowPage() {
             <div className={styles.HeaderTitle}>AVAILABLE FOR BORROWING</div>
             <div className={styles.Headerdiv}>
               <img src={ckBTC} width={24} height={24} alt="" />
-              <div className={styles.MTop}>NaN ckBTC</div>
+              <div className={styles.MTop}>
+                {(parseFloat(balanceBorrowBTC) / 10 ** 18).toFixed(6) || 0}
+                {' '}
+                ckBTC
+              </div>
             </div>
             <div className={styles.Headerdiv}>
               <img src={ckETH} width={24} height={24} alt="" />
-              <div className={styles.MTop}>NaN ckETH</div>
+              <div className={styles.MTop}>
+                {(parseFloat(balanceBorrowETH) / 10 ** 18).toFixed(6) || 0}
+                {' '}
+                ckETH
+              </div>
             </div>
           </div>
           <div className={styles.HeaderRight}>

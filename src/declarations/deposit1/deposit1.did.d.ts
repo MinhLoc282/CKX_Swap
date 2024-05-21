@@ -10,11 +10,6 @@ export interface Account__1 {
   'owner' : Principal,
   'subaccount' : [] | [Subaccount],
 }
-export interface AdvancedSettings {
-  'permitted_drift' : Timestamp,
-  'burned_tokens' : Balance,
-  'transaction_window' : Timestamp,
-}
 export interface Allowance {
   'allowance' : bigint,
   'expires_at' : [] | [bigint],
@@ -62,6 +57,69 @@ export interface BurnArgs {
   'created_at_time' : [] | [bigint],
   'amount' : Balance,
 }
+export interface Deposit {
+  'addToken' : ActorMethod<[Principal, string], TxReceipt>,
+  'approveToken' : ActorMethod<[bigint], ApproveResult>,
+  'balanceOf' : ActorMethod<[string, Principal], bigint>,
+  'burn' : ActorMethod<[BurnArgs], TransferResult>,
+  'deposit' : ActorMethod<[Principal, bigint, bigint], TxReceipt>,
+  'depositReward' : ActorMethod<[Principal, bigint], TxReceipt>,
+  'deposit_cycles' : ActorMethod<[], undefined>,
+  'getCurrentMultiplier' : ActorMethod<[DepositType], number>,
+  'getDepositId' : ActorMethod<[Principal], [] | [Array<DepositType>]>,
+  'getICRC1SubAccountBalance' : ActorMethod<
+    [Principal, string],
+    ICRC1SubAccountBalance
+  >,
+  'getInterestInfo' : ActorMethod<[Principal], bigint>,
+  'getInterestUI' : ActorMethod<[Principal], number>,
+  'getMultiplier' : ActorMethod<[Time, Time, number, number, bigint], number>,
+  'getPrincipal' : ActorMethod<[], Principal>,
+  'getTokenBalance' : ActorMethod<[Principal], Balance__1>,
+  'getTokenDecimals' : ActorMethod<[], number>,
+  'getTokenId' : ActorMethod<[], string>,
+  'getWrapBalance' : ActorMethod<[Principal], Balance__1>,
+  'get_transaction' : ActorMethod<[TxIndex__1], [] | [Transaction__1]>,
+  'get_transactions' : ActorMethod<
+    [GetTransactionsRequest],
+    GetTransactionsResponse
+  >,
+  'icrc1_balance_of' : ActorMethod<[Account__1], Balance__1>,
+  'icrc1_decimals' : ActorMethod<[], number>,
+  'icrc1_fee' : ActorMethod<[], Balance__1>,
+  'icrc1_metadata' : ActorMethod<[], Array<MetaDatum>>,
+  'icrc1_minting_account' : ActorMethod<[], [] | [Account__1]>,
+  'icrc1_name' : ActorMethod<[], string>,
+  'icrc1_supported_standards' : ActorMethod<[], Array<SupportedStandard>>,
+  'icrc1_symbol' : ActorMethod<[], string>,
+  'icrc1_total_supply' : ActorMethod<[], Balance__1>,
+  'icrc1_transfer' : ActorMethod<[TransferArgs], TransferResult>,
+  'icrc2_allowance' : ActorMethod<[AllowanceArgs], Allowance>,
+  'icrc2_approve' : ActorMethod<[ApproveArgs], ApproveResult>,
+  'icrc2_transfer_from' : ActorMethod<[TransferFromArgs], TransferFromResult>,
+  'inc' : ActorMethod<[], string>,
+  'mint' : ActorMethod<[Mint], TransferResult>,
+  'privateBurn' : ActorMethod<[bigint], TransferResult>,
+  'privateWithdraw' : ActorMethod<[bigint, Principal], TransferResult>,
+  'setTokenId' : ActorMethod<[string], string>,
+  'timeNow' : ActorMethod<[], bigint>,
+  'unWrapToken' : ActorMethod<[bigint], TransferResult>,
+  'withdrawDepositAndInterestArray' : ActorMethod<
+    [Array<bigint>],
+    Array<bigint>
+  >,
+  'withdrawInterestAll' : ActorMethod<[], TransferResult>,
+}
+export interface DepositType {
+  'id' : bigint,
+  'startTime' : Time,
+  'duration' : bigint,
+  'firstMultiplier' : number,
+  'isActive' : boolean,
+  'lastUpdateTime' : bigint,
+  'amount' : bigint,
+  'lastClaimedTime' : bigint,
+}
 export interface GetTransactionsRequest { 'start' : TxIndex, 'length' : bigint }
 export interface GetTransactionsRequest__1 {
   'start' : TxIndex,
@@ -73,6 +131,8 @@ export interface GetTransactionsResponse {
   'transactions' : Array<Transaction>,
   'archived_transactions' : Array<ArchivedTransaction>,
 }
+export type ICRC1SubAccountBalance = { 'ok' : bigint } |
+  { 'err' : string };
 export type MetaDatum = [string, Value];
 export interface Mint {
   'to' : Account,
@@ -92,42 +152,8 @@ export type QueryArchiveFn = ActorMethod<
 >;
 export type Subaccount = Uint8Array | number[];
 export interface SupportedStandard { 'url' : string, 'name' : string }
+export type Time = bigint;
 export type Timestamp = bigint;
-export interface Token {
-  'burn' : ActorMethod<[BurnArgs], TransferResult>,
-  'deposit_cycles' : ActorMethod<[], undefined>,
-  'get_transaction' : ActorMethod<[TxIndex__1], [] | [Transaction__1]>,
-  'get_transactions' : ActorMethod<
-    [GetTransactionsRequest],
-    GetTransactionsResponse
-  >,
-  'icrc1_balance_of' : ActorMethod<[Account__1], Balance__1>,
-  'icrc1_decimals' : ActorMethod<[], number>,
-  'icrc1_fee' : ActorMethod<[], Balance__1>,
-  'icrc1_metadata' : ActorMethod<[], Array<MetaDatum>>,
-  'icrc1_minting_account' : ActorMethod<[], [] | [Account__1]>,
-  'icrc1_name' : ActorMethod<[], string>,
-  'icrc1_supported_standards' : ActorMethod<[], Array<SupportedStandard>>,
-  'icrc1_symbol' : ActorMethod<[], string>,
-  'icrc1_total_supply' : ActorMethod<[], Balance__1>,
-  'icrc1_transfer' : ActorMethod<[TransferArgs], TransferResult>,
-  'icrc2_allowance' : ActorMethod<[AllowanceArgs], Allowance>,
-  'icrc2_approve' : ActorMethod<[ApproveArgs], ApproveResult>,
-  'icrc2_transfer_from' : ActorMethod<[TransferFromArgs], TransferFromResult>,
-  'mint' : ActorMethod<[Mint], TransferResult>,
-  'transfer_from_minting_account' : ActorMethod<[Balance__1], TransferResult>,
-}
-export interface TokenInitArgs {
-  'fee' : Balance,
-  'advanced_settings' : [] | [AdvancedSettings],
-  'decimals' : number,
-  'minting_account' : [] | [Account],
-  'name' : string,
-  'initial_balances' : Array<[Account, Balance]>,
-  'min_burn_amount' : Balance,
-  'max_supply' : Balance,
-  'symbol' : string,
-}
 export interface Transaction {
   'burn' : [] | [Burn],
   'kind' : string,
@@ -196,10 +222,12 @@ export type TransferResult = { 'Ok' : TxIndex } |
   { 'Err' : TransferError };
 export type TxIndex = bigint;
 export type TxIndex__1 = bigint;
+export type TxReceipt = { 'ok' : bigint } |
+  { 'err' : string };
 export type Value = { 'Int' : bigint } |
   { 'Nat' : bigint } |
   { 'Blob' : Uint8Array | number[] } |
   { 'Text' : string };
-export interface _SERVICE extends Token {}
+export interface _SERVICE extends Deposit {}
 export declare const idlFactory: IDL.InterfaceFactory;
 export declare const init: (args: { IDL: typeof IDL }) => IDL.Type[];

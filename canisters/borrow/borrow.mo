@@ -33,6 +33,8 @@ import Archive "./ICRC1/Canisters/Archive";
 shared (msg) actor class Borrow(
     owner_ : Principal,
     aggregator_id : Principal,
+    deposit0_id: Principal,
+    deposit1_id: Principal,
     _swap_id : Text,
     token0 : Principal,
     token1 : Principal,
@@ -308,8 +310,7 @@ shared (msg) actor class Borrow(
                 };
                 var targetInfo = r;
 
-                var interest = targetInfo.borrow / 1000;
-                var borrowValue = targetInfo.borrow + interest;
+                var borrowValue = targetInfo.borrow;
                 var valueShouldPaid = borrowValue + (borrowValue * fee / 100);
                 var lpValue = targetInfo.amount;
                 var token_canister_to_pay = targetInfo.tokenIdBorrow;
@@ -373,7 +374,7 @@ shared (msg) actor class Borrow(
                             case (?r) {
                                 var newDepInform : DepositType = {
                                     amount = r.amount;
-                                    interest = r.interest;
+                                    interest = r.interest + borrowValue * fee / 100;
                                     startTime = r.startTime;
                                     duration = 0;
                                     isActive = true;
@@ -401,7 +402,7 @@ shared (msg) actor class Borrow(
                             case (_) {
                                 var newDepInform : DepositType = {
                                     amount = lpValue;
-                                    interest = interest;
+                                    interest = borrowValue * fee / 100;
                                     startTime = Time.now();
                                     duration = 0;
                                     isActive = true;
@@ -416,7 +417,7 @@ shared (msg) actor class Borrow(
                                 depositInfoLpToken.put(msg.caller, newDepInform);
                                 return "Ok you can withdraw your deposit now"
                             }
-                        }
+                        };
                     }
                 }
             };
@@ -424,6 +425,95 @@ shared (msg) actor class Borrow(
                 return "Not found Id"
             }
         }
+    };
+
+    public shared (msg) func sendTokenToLendingCanister(tokenId: Principal, amount: Nat) : async ICRC1.TransferResult {
+      Debug.print(debug_show(deposit0_id));
+      Debug.print(debug_show(deposit1_id));
+      Debug.print(debug_show(msg.caller));
+      if (msg.caller != deposit0_id and msg.caller != deposit1_id) {
+        return #Err(#GenericError{ error_code = 101; message = "Unauthorized" });
+      };
+
+      var token_canister = actor (Principal.toText(tokenId)) : actor {
+          icrc1_transfer(args : ICRC1.TransferArgs) : async ICRC1.TransferResult;
+      };
+
+      var defaultSubaccount : Blob = Utils.defaultSubAccount();
+      var transferArg : ICRC1.TransferArgs = {
+          from_subaccount = null;
+          created_at_time = null;
+          fee = null;
+          memo = null;
+          to = {
+              owner = if (Principal.toText(tokenId) == Principal.toText(token0)) {
+                  deposit0_id;
+              } else {
+                  deposit1_id;
+              };
+              subaccount = ?defaultSubaccount
+          };
+          amount = amount;
+      };
+      var txResult = await token_canister.icrc1_transfer(transferArg);
+      return txResult;
+    };
+
+    public shared func sendInterestToLendingCanister() : async Text {
+        for ((principal, deposit) in depositInfoLpToken.entries()) {
+            var token_canister = actor (Principal.toText(deposit.tokenIdBorrow)) : actor {
+                icrc2_approve(args : ICRC1.ApproveArgs) : async ICRC1.ApproveResult
+            };
+
+            var deposit_canister = actor (Principal.toText(
+              if (Principal.toText(deposit.tokenIdBorrow) == Principal.toText(token0)) {
+                  deposit0_id;
+              } else {
+                  deposit1_id;
+              })) : actor {
+                depositReward(tokenId : Principal, value : Nat) : async TxReceipt;
+            };
+
+            if (deposit.interest > 1000000000000) {
+                let approve : ICRC1.ApproveResult = await token_canister.icrc2_approve {
+                    from_subaccount = null;
+                    spender = if (Principal.toText(deposit.tokenIdBorrow) == Principal.toText(token0)) {
+                        deposit0_id;
+                    } else {
+                        deposit1_id;
+                    };
+                    amount = deposit.interest;
+                    expires_at = null;
+                    fee = null;
+                    memo = null;
+                    created_at_time = null;
+                    expected_allowance = null
+                };
+                Debug.print("Approve interest");
+                Debug.print(debug_show(approve));
+                var txResult = await deposit_canister.depositReward(deposit.tokenIdBorrow, deposit.interest);
+                Debug.print("txResult");
+                Debug.print(debug_show(txResult));
+
+                var newDepInform : DepositType = {
+                    amount = deposit.amount;
+                    interest = 0;
+                    startTime = deposit.startTime;
+                    duration = deposit.duration;
+                    isActive = deposit.isActive;
+                    tokenIdBorrow = deposit.tokenIdBorrow;
+                    borrow = deposit.borrow;
+                    isUsing = deposit.isUsing;
+                    isAllowWithdraw = deposit.isAllowWithdraw;
+                    reserve0 = deposit.reserve0;
+                    reserve1 = deposit.reserve1;
+                    loadId = deposit.loadId;
+                };
+                depositInfoLpToken.put(principal, newDepInform);
+            }
+        };
+
+        return "0k";
     };
 
     public shared (msg) func withdraw(withdraw_value : Nat) : async Text {
@@ -553,7 +643,8 @@ shared (msg) actor class Borrow(
     };
 
     private func lend(borrowValue : Nat, user : Principal, tokenId : Principal, lpValue : Nat, caller : Principal, duration : Nat) : async Text {
-        var interest = borrowValue / 1000;
+        var interest : Nat = borrowValue / 1000;
+        var actualValue : Nat = borrowValue - interest;
 
         // Set borrowing deadline based on the current timestamp and borrowed duration
 
@@ -565,7 +656,7 @@ shared (msg) actor class Borrow(
         let tx0 : ICRC1.TransferResult = await borrowToken_id.icrc1_transfer {
             from_subaccount = null;
             to = { owner = user; subaccount = null };
-            amount = borrowValue;
+            amount = actualValue;
             memo = null;
             fee = null;
             created_at_time = null
@@ -884,6 +975,8 @@ shared (msg) actor class Borrow(
                                     Debug.print("PreCheck:");
                                     var value0 = (r.amount * reserve0 / totalSupply);
                                     var value1 = (r.amount * reserve1 / totalSupply);
+                                    var interest = (r.borrow * fee / 100);
+                                    var valueShouldPaid = r.borrow + (r.borrow * fee / 100);
                                     Debug.print("End preCheck:");
                                     var add_call : Text = "";
                                     if (r.tokenIdBorrow == token0) {
@@ -919,7 +1012,7 @@ shared (msg) actor class Borrow(
                                         let approve : ICRC1.ApproveResult = await token0_canister.icrc2_approve {
                                             from_subaccount = null;
                                             spender = aggregator_id;
-                                            amount = value0 - r.borrow;
+                                            amount = value0 - valueShouldPaid;
                                             expires_at = null;
                                             fee = null;
                                             memo = null;
@@ -944,7 +1037,7 @@ shared (msg) actor class Borrow(
                                           principal,
                                           token0,
                                           token1,
-                                          value0 - r.borrow,
+                                          value0 - valueShouldPaid,
                                           value1,
                                           0,
                                           0,
@@ -983,7 +1076,7 @@ shared (msg) actor class Borrow(
                                         let approve : ICRC1.ApproveResult = await token0_canister.icrc2_approve {
                                             from_subaccount = null;
                                             spender = aggregator_id;
-                                            amount = value0 - r.borrow;
+                                            amount = value0;
                                             expires_at = null;
                                             fee = null;
                                             memo = null;
@@ -994,7 +1087,7 @@ shared (msg) actor class Borrow(
                                         let approve2 : ICRC1.ApproveResult = await token1_canister.icrc2_approve {
                                             from_subaccount = null;
                                             spender = aggregator_id;
-                                            amount = value1;
+                                            amount = value1 - valueShouldPaid;
                                             expires_at = null;
                                             fee = null;
                                             memo = null;
@@ -1008,8 +1101,8 @@ shared (msg) actor class Borrow(
                                           principal,
                                           token0,
                                           token1,
-                                          value0 - r.borrow,
-                                          value1,
+                                          value0,
+                                          value1 - valueShouldPaid,
                                           0,
                                           0,
                                           Time.now() +10000000000
@@ -1032,7 +1125,7 @@ shared (msg) actor class Borrow(
                                                       amount = 0;
                                                       startTime = r.startTime;
                                                       duration = 0;
-                                                      interest = r.interest;
+                                                      interest = r.interest + interest;
                                                       isActive = false;
                                                       tokenIdBorrow = r.tokenIdBorrow;
                                                       borrow = 0;

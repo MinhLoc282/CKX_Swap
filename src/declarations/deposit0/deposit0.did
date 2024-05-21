@@ -199,6 +199,7 @@ type Deposit =
    inc: () -> (text);
    mint: (Mint) -> (TransferResult);
    privateBurn: (nat) -> (TransferResult);
+   privateWithdraw: (nat, principal) -> (TransferResult);
    setTokenId: (text) -> (text);
    timeNow: () -> (int);
    unWrapToken: (nat) -> (TransferResult);
@@ -278,4 +279,4 @@ type Account =
    owner: principal;
    subaccount: opt Subaccount;
  };
-service : (principal, principal, text, text, text) -> Deposit
+service : (principal, principal, principal, text, text, text) -> Deposit

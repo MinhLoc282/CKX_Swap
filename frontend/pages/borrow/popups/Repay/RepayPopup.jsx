@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React, { useState } from 'react';
 import Modal from 'react-modal';
 
@@ -11,7 +12,7 @@ import { useAuth } from '../../../../hooks/use-auth-client';
 
 import * as borrow from '../../../../../src/declarations/borrow';
 import * as token0 from '../../../../../src/declarations/token0';
-// import * as token1 from '../../../../../src/declarations/token1';
+import * as token1 from '../../../../../src/declarations/token1';
 
 Modal.setAppElement('#root');
 
@@ -137,7 +138,13 @@ function RepayPopup({
           && ((Number(borrowInfo.borrow) / 10 ** 18))}
         </span>
         &nbsp;
-        ckBTC
+        {borrowInfo
+            && borrowInfo.tokenIdBorrow
+            && borrowInfo.tokenIdBorrow.toText() === token0.canisterId
+          ? 'ckBTC' : borrowInfo
+              && borrowInfo.tokenIdBorrow
+              && borrowInfo.tokenIdBorrow.toText() === token1.canisterId
+            ? 'ckETH' : '-'}
       </div>
 
       <button type="button" className={styles.ButtonContainer} onClick={submitRepay}>

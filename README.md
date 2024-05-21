@@ -80,13 +80,16 @@ dfx canister call swap createPair "(principal \"$(dfx canister id token0 --netwo
 dfx deploy --network ic aggregator --argument="(principal \"$(dfx identity get-principal)\", principal \"$(dfx canister --network ic id aggregator)\", \"$(dfx canister --network ic id swap)\")"
 
 ### Deploy deposit (staking) canister and authority for 2 token
-dfx deploy --network ic deposit --argument="(principal \"$(dfx identity get-principal)\", principal \"$(dfx canister --network ic id deposit)\", \"d.ckETH'\", \"d.ckETH\", \"$(dfx canister --network ic id token0)\")"
+dfx deploy --network ic deposit0 --argument="(principal \"$(dfx identity get-principal)\", principal \"$(dfx canister --network ic id deposit0)\", principal \"$(dfx canister --network ic id borrow)\", \"d.ckBTC'\", \"d.ckBTC\", \"$(dfx canister --network ic id token0)\")"
 
-dfx canister call deposit addToken "(principal \"$(dfx canister --network ic id token0)\", \"ICRC2\")" --network ic
-dfx canister call deposit addToken "(principal \"$(dfx canister --network ic id token1)\", \"ICRC2\")" --network ic
+dfx canister call deposit0 addToken "(principal \"$(dfx canister --network ic id token0)\", \"ICRC2\")" --network ic
+
+dfx deploy --network ic deposit1 --argument="(principal \"$(dfx identity get-principal)\", principal \"$(dfx canister --network ic id deposit1)\", principal \"$(dfx canister --network ic id borrow)\",\"d.ckETH'\", \"d.ckETH\", \"$(dfx canister --network ic id token1)\")"
+
+dfx canister call deposit1 addToken "(principal \"$(dfx canister --network ic id token1)\", \"ICRC2\")" --network ic
 
 ### Deploy borrow canister
-dfx deploy --network ic borrow --argument="(principal \"$(dfx identity get-principal)\", principal \"$(dfx canister --network ic id aggregator)\", \"$(dfx canister --network ic id swap)\", principal \"$(dfx canister --network ic id token0)\", principal \"$(dfx canister --network ic id token1)\")"
+dfx deploy --network ic borrow --argument="(principal \"$(dfx identity get-principal)\", principal \"$(dfx canister --network ic id aggregator)\", principal \"$(dfx canister --network ic id deposit0)\", principal \"$(dfx canister --network ic id deposit1)\", \"$(dfx canister --network ic id swap)\", principal \"$(dfx canister --network ic id token0)\", principal \"$(dfx canister --network ic id token1)\")"
 ```
 
 ### Step 3. Run UI

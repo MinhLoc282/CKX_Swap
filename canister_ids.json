@@ -11,6 +11,12 @@
   "deposit": {
     "ic": "2xvnm-xiaaa-aaaap-qhjvq-cai"
   },
+  "deposit0": {
+    "ic": "pma24-iiaaa-aaaap-qhkhq-cai"
+  },
+  "deposit1": {
+    "ic": "nr5uu-3aaaa-aaaap-qhkia-cai"
+  },
   "swap": {
     "ic": "3uzek-dqaaa-aaaap-qhjta-cai"
   },

@@ -23,7 +23,7 @@ const customStyles = {
     color: 'white',
     background: 'linear-gradient(0deg, #1C1D26, #1C1D26), linear-gradient(0deg, #2C2D3B, #2C2D3B)',
     width: '444px',
-    height: '622px',
+    height: '522px',
     top: '50%',
     left: '50%',
     right: 'auto',
@@ -81,9 +81,9 @@ function BorrowPopup({
       let newAmountIn;
 
       if (!selectToken) {
-        newAmountIn = (percentage * (avaiBorrow[1])) / 100;
-      } else {
         newAmountIn = (percentage * (avaiBorrow[0])) / 100;
+      } else {
+        newAmountIn = (percentage * (avaiBorrow[1])) / 100;
       }
 
       setAmountInput(newAmountIn);
@@ -113,6 +113,8 @@ function BorrowPopup({
         if (selectToken) {
           tokenCanister = token1.canisterId;
         }
+
+        console.log(amountInput);
 
         const tx = await borrowActor.borrow(
           amountInput - 10000, // prevent bigInt
@@ -156,7 +158,7 @@ function BorrowPopup({
         <h2 className={styles.Title}>Borrow</h2>
       </div>
 
-      <div className={styles.LabelContainer}>
+      {/* <div className={styles.LabelContainer}>
         <div className={styles.Label1}>
           Value of collaterial
           &nbsp;
@@ -182,7 +184,7 @@ function BorrowPopup({
         Borrowing Limit is NaN
         {' '}
         {selectToken ? 'ckETH' : 'ckBTC'}
-      </div>
+      </div> */}
 
       <div>
         <div className={styles.LabelContainer}>
@@ -234,9 +236,9 @@ function BorrowPopup({
               className={styles.MaxButton}
               onClick={() => {
                 if (!selectToken && !isActive) {
-                  setAmountInput((avaiBorrow[1]));
-                } else if (selectToken && !isActive) {
                   setAmountInput((avaiBorrow[0]));
+                } else if (selectToken && !isActive) {
+                  setAmountInput((avaiBorrow[1]));
                 } else {
                   setAmountInput(0);
                 }

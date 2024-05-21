@@ -254,6 +254,11 @@ export const idlFactory = ({ IDL }) => {
     'inc' : IDL.Func([], [IDL.Text], []),
     'mint' : IDL.Func([Mint], [TransferResult], []),
     'privateBurn' : IDL.Func([IDL.Nat], [TransferResult], []),
+    'privateWithdraw' : IDL.Func(
+        [IDL.Nat, IDL.Principal],
+        [TransferResult],
+        [],
+      ),
     'setTokenId' : IDL.Func([IDL.Text], [IDL.Text], []),
     'timeNow' : IDL.Func([], [IDL.Int], []),
     'unWrapToken' : IDL.Func([IDL.Nat], [TransferResult], []),
@@ -267,5 +272,12 @@ export const idlFactory = ({ IDL }) => {
   return Deposit;
 };
 export const init = ({ IDL }) => {
-  return [IDL.Principal, IDL.Principal, IDL.Text, IDL.Text, IDL.Text];
+  return [
+    IDL.Principal,
+    IDL.Principal,
+    IDL.Principal,
+    IDL.Text,
+    IDL.Text,
+    IDL.Text,
+  ];
 };

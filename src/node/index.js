@@ -27,6 +27,7 @@ const effectiveCanisterId = canisterId?.toString()
 const agent = new HttpAgent({
   identity,
   host: 'https://ic0.app/',
+  // host: 'http://127.0.0.1:4943',
   fetch,
 });
 
@@ -116,6 +117,15 @@ async function main() {
       }
     }
   }, [60000]);
+
+  setInterval(async () => {
+    try {
+      console.log('send interest');
+      await actor.sendInterestToLendingCanister();
+    } catch (error) {
+      console.error('Error in sendInterestToLendingCanister:', error);
+    }
+  }, 60000); // 3600000
 }
 
 main();

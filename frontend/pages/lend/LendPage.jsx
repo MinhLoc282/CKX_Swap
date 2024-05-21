@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Principal } from '@dfinity/principal';
 import DepositPopup from './popups/Deposit/DepositPopup';
 import WithdrawPopup from './popups/Withdraw/WithdrawPopup';
 import ClaimPopup from './popups/Claim/ClaimPopup';
@@ -11,15 +12,23 @@ import ckBTC from '../../assets/ckBTC.png';
 import ckETH from '../../assets/ckETH.png';
 import dckBTC from '../../assets/d.ckBTC.png';
 import dckETH from '../../assets/d.cketh.png';
+import * as deposit0 from '../../../src/declarations/deposit0';
+import * as deposit1 from '../../../src/declarations/deposit1';
+import * as token0 from '../../../src/declarations/token0';
+import * as token1 from '../../../src/declarations/token1';
 
 function LendPage() {
+  const {
+    deposit0Actor, deposit1Actor, principal, token0Actor, token1Actor,
+  } = useAuth();
+
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
   const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
   const [isClaimOpen, setIsClaimOpen] = useState(false);
   const [switchPage, setSwitchPage] = useState('ckETH');
   const [lockedckETH, setLockedckETH] = useState(0);
-
-  const { depositActor, principal } = useAuth();
+  const [depositActor, setDepositActor] = useState(deposit1Actor);
+  const [tokenActor, setToken0Actor] = useState(token1Actor);
 
   const openDepositModal = () => {
     setIsDepositModalOpen(true);
@@ -44,7 +53,6 @@ function LendPage() {
   const closeClaim = () => {
     setIsClaimOpen(false);
   };
-  console.log('rerender');
   const [wrapBalance, setWrapBalance] = useState();
   const [depositedValue, setDepositedValue] = useState();
   const [tokenBalance, setTokenBalance] = useState();
@@ -54,6 +62,11 @@ function LendPage() {
   const [updateUI, setUpdateUI] = useState(false);
 
   useEffect(() => {
+    setDepositActor(switchPage === 'ckETH' ? deposit1Actor : deposit0Actor);
+    setToken0Actor(switchPage === 'ckETH' ? token1Actor : token0Actor);
+  }, [switchPage, deposit0Actor, deposit1Actor, token0Actor, token1Actor]);
+
+  useEffect(() => {
     const getBalanceUI = async () => {
       if (principal) {
         try {
@@ -61,7 +74,7 @@ function LendPage() {
           setTokenBalance(Number(tx));
           const tx2 = await depositActor.getWrapBalance(principal);
           setWrapBalance(Number(tx2));
-          const tx3 = await depositActor.getInterestUI(principal);
+          const tx3 = await depositActor.getInterestInfo(principal);
           setInterest(Number(tx3));
         } catch (error) {
           console.log(error);
@@ -87,7 +100,7 @@ function LendPage() {
           let totalDeposited = 0;
           const idPromises = originalList.forEach(async (item) => {
             if (item.isActive && (Number((Date.now()) * 10 ** 6 - Number(item.startTime))
-            < Number(item.duration) * 60 * 1000000000)) {
+            < Number(item.duration) * 24 * 60 * 60 * 1000000000)) {
               const value = await fetchCurrentWrap(item);
               const wrapValue = Number(value) / 10 ** decimals;
               totalWrap += Number(wrapValue);
@@ -130,6 +143,9 @@ function LendPage() {
         decimals={decimals}
         tokenBalance={tokenBalance}
         setUpdateUI={setUpdateUI}
+        depositActor={depositActor}
+        tokenActor={tokenActor}
+        btcOrEth={switchPage}
       />
       <WithdrawPopup
         isWithdrawModalOpen={isWithdrawModalOpen}
@@ -137,6 +153,8 @@ function LendPage() {
         decimals={decimals}
         wrapBalance={wrapBalance}
         setUpdateUI={setUpdateUI}
+        depositActor={depositActor}
+        btcOrEth={switchPage}
       />
       <ClaimPopup
         isClaimOpen={isClaimOpen}
@@ -144,6 +162,8 @@ function LendPage() {
         decimals={decimals}
         value={(interest / 10 ** decimals).toFixed(6)}
         setUpdateUI={setUpdateUI}
+        depositActor={depositActor}
+        btcOrEth={switchPage}
       />
       <div className={styles.Container}>
         <div className={styles.Header}>

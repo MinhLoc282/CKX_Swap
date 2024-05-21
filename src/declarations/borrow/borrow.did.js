@@ -20,7 +20,24 @@ export const idlFactory = ({ IDL }) => {
     'borrower' : IDL.Principal,
     'tokenIdBorrow' : IDL.Principal,
   });
+  const Balance__1 = IDL.Nat;
+  const TxIndex = IDL.Nat;
   const Balance = IDL.Nat;
+  const Timestamp = IDL.Nat64;
+  const TransferError = IDL.Variant({
+    'GenericError' : IDL.Record({
+      'message' : IDL.Text,
+      'error_code' : IDL.Nat,
+    }),
+    'TemporarilyUnavailable' : IDL.Null,
+    'BadBurn' : IDL.Record({ 'min_burn_amount' : Balance }),
+    'Duplicate' : IDL.Record({ 'duplicate_of' : TxIndex }),
+    'BadFee' : IDL.Record({ 'expected_fee' : Balance }),
+    'CreatedInFuture' : IDL.Record({ 'ledger_time' : Timestamp }),
+    'TooOld' : IDL.Null,
+    'InsufficientFunds' : IDL.Record({ 'balance' : Balance }),
+  });
+  const TransferResult = IDL.Variant({ 'Ok' : TxIndex, 'Err' : TransferError });
   const TxReceipt = IDL.Variant({ 'ok' : IDL.Nat, 'err' : IDL.Text });
   const Borrow = IDL.Service({
     'borrow' : IDL.Func([IDL.Nat, IDL.Principal, IDL.Nat], [IDL.Text], []),
@@ -43,10 +60,20 @@ export const idlFactory = ({ IDL }) => {
     'getPairInfo' : IDL.Func([IDL.Nat], [IDL.Vec(IDL.Nat)], []),
     'getPairInfoPrincipal' : IDL.Func([IDL.Nat], [IDL.Vec(IDL.Text)], []),
     'getReserves' : IDL.Func([], [IDL.Vec(IDL.Nat)], []),
-    'getTokenBalance' : IDL.Func([IDL.Principal, IDL.Principal], [Balance], []),
+    'getTokenBalance' : IDL.Func(
+        [IDL.Principal, IDL.Principal],
+        [Balance__1],
+        [],
+      ),
     'getTokenDecimals' : IDL.Func([IDL.Principal], [IDL.Nat8], []),
     'getloanId' : IDL.Func([], [IDL.Nat], []),
     'rePay' : IDL.Func([], [IDL.Text], []),
+    'sendInterestToLendingCanister' : IDL.Func([], [IDL.Text], []),
+    'sendTokenToLendingCanister' : IDL.Func(
+        [IDL.Principal, IDL.Nat],
+        [TransferResult],
+        [],
+      ),
     'totalSupply_call' : IDL.Func([IDL.Text], [IDL.Nat], []),
     'user' : IDL.Func([], [IDL.Text], []),
     'withdraw' : IDL.Func([IDL.Nat], [IDL.Text], []),
@@ -59,5 +86,13 @@ export const idlFactory = ({ IDL }) => {
   return Borrow;
 };
 export const init = ({ IDL }) => {
-  return [IDL.Principal, IDL.Principal, IDL.Text, IDL.Principal, IDL.Principal];
+  return [
+    IDL.Principal,
+    IDL.Principal,
+    IDL.Principal,
+    IDL.Principal,
+    IDL.Text,
+    IDL.Principal,
+    IDL.Principal,
+  ];
 };

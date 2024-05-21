@@ -22,7 +22,11 @@
       "type": "motoko",
       "main": "canisters/ICRC1/Canisters/token.mo"
     },
-    "deposit": {
+    "deposit0": {
+      "type": "motoko",
+      "main": "canisters/deposit/deposit.mo"
+    },
+    "deposit1": {
       "type": "motoko",
       "main": "canisters/deposit/deposit.mo"
     },

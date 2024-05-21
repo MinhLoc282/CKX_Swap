@@ -1,7 +1,10 @@
+/* eslint-disable no-nested-ternary */
 import React from 'react';
 import PropTypes from 'prop-types';
 import styles from './index.module.css';
 import BottomBorrow from './BottomBorrow/BottomBorrow';
+import * as token0 from '../../../src/declarations/token0';
+import * as token1 from '../../../src/declarations/token1';
 
 // import Graph from '../../assets/Graph.png';
 
@@ -89,7 +92,7 @@ function Borrow(
                       {' ckBTC <> ckETH LP token'}
                     </span>
                   </div>
-                  <div style={{ color: '#858697', fontSize: '12px' }}>{'< $ 0.01'}</div>
+                  <div style={{ color: '#858697', fontSize: '12px' }}># of ckBTC, # of ckETH</div>
                 </div>
                 <button type="button" style={{ width: '90%', marginBottom: '12px' }} className={styles.ButtonContainer} onClick={openSupplyModal}>
                   Supply
@@ -101,34 +104,35 @@ function Borrow(
                     {Math.round((tokenBalance / 10 ** 18) * 100) / 100}
                     {' '}
                     <span className={styles.MediumTitle}>{'ckBTC <> ckETH LP token'}</span>
+                    <div style={{ color: '#858697', fontSize: '12px' }}># of ckBTC, # of ckETH</div>
                   </div>
                 </div>
               </div>
 
               <div className={styles.ModalControlsItem}>
                 <div>Available to borrow</div>
-                <div style={{ display: 'flex', height: '43px' }}>
+                <div style={{ display: 'flex', height: '25px' }}>
                   <div className={styles.BorrowAvaiItem}>
-                    <div style={{ marginBottom: '-8px' }}>
-                      <span className={styles.largeNum}>
-                        {!isActive
-                          ? Math.round(Number(((avaiBorrow[1]) / 10 ** 18)) * 1000) / 1000 : 0}
-                      </span>
-                      {' '}
-                      <span className={styles.MediumTitle}>ckBTC</span>
-                    </div>
-                    <div className={styles.TextSmall}>{'< $ 0.01'}</div>
-                  </div>
-                  <div className={styles.BorrowAvaiItem} style={{ paddingLeft: '24px' }}>
                     <div style={{ marginBottom: '-8px' }}>
                       <span className={styles.largeNum}>
                         {!isActive
                           ? Math.round(Number(((avaiBorrow[0]) / 10 ** 18)) * 1000) / 1000 : 0}
                       </span>
                       {' '}
+                      <span className={styles.MediumTitle}>ckBTC</span>
+                    </div>
+                    {/* <div className={styles.TextSmall}>{'< $ 0.01'}</div> */}
+                  </div>
+                  <div className={styles.BorrowAvaiItem} style={{ paddingLeft: '24px' }}>
+                    <div style={{ marginBottom: '-8px' }}>
+                      <span className={styles.largeNum}>
+                        {!isActive
+                          ? Math.round(Number(((avaiBorrow[1]) / 10 ** 18)) * 1000) / 1000 : 0}
+                      </span>
+                      {' '}
                       <span className={styles.MediumTitle}>ckETH</span>
                     </div>
-                    <div className={styles.TextSmall}>{'< $ 0.01'}</div>
+                    {/* <div className={styles.TextSmall}>{'< $ 0.01'}</div> */}
                   </div>
                 </div>
                 <button type="button" className={styles.ButtonContainer} onClick={openBorrowModal}>
@@ -162,7 +166,15 @@ function Borrow(
                           ? 0 : ''}
                       </span>
                       {' '}
-                      <span className={styles.MediumTitle}>ckBTC</span>
+                      <span className={styles.MediumTitle}>
+                        {borrowInfo
+                      && borrowInfo.tokenIdBorrow
+                      && borrowInfo.tokenIdBorrow.toText() === token0.canisterId
+                          ? 'ckBTC' : borrowInfo
+                          && borrowInfo.tokenIdBorrow
+                          && borrowInfo.tokenIdBorrow.toText() === token1.canisterId
+                            ? 'ckETH' : '-'}
+                      </span>
                     </div>
                   </div>
                   <div className={styles.BorrowAvaiItem} style={{ paddingLeft: '24px', paddingRight: '0px' }}>
@@ -197,14 +209,14 @@ function Borrow(
                       {' ckBTC <> ckETH LP token'}
                     </span>
                   </div>
-                  <div style={{ color: '#858697', fontSize: '12px' }}>{'< $ 0.01'}</div>
+                  {/* <div style={{ color: '#858697', fontSize: '12px' }}>{'< $ 0.01'}</div> */}
                 </div>
                 <button type="button" style={{ width: '90%', marginBottom: '12px' }} className={styles.ButtonContainer} onClick={openWithdrawModal}>
                   Withdraw
                   <div className={styles.Ellipse} />
                 </button>
                 <div className={styles.TextXSmall}>
-                  Based on minimum collateral ratio and outstanding loan
+                  Collateral withdrawal only after all loans are paid
                 </div>
               </div>
             </div>

@@ -25,7 +25,6 @@ function Withdraw() {
   const [lpTokenBalance, setLpTokenBalance] = useState(0);
   const [decimals0, setDecimals0] = useState(0);
   const [decimals1, setDecimals1] = useState(0);
-  const [amountInput, setAmountInput] = useState(0);
   const [amountInput0, setAmountInput0] = useState(0);
   const [amountInput1, setAmountInput1] = useState(0);
   const [amountLPInput, setAmountLPInput] = useState(0);
@@ -41,7 +40,6 @@ function Withdraw() {
       setAmountInput0(newAmountIn0);
       setAmountInput1(newAmountIn1);
       setAmountLPInput(newLpTokenBalance);
-      setAmountInput(newAmountIn0 + newAmountIn1);
       setQuickInputAmountIn(percentage);
     }
     if (percentage === quickInputAmountIn) {
@@ -173,26 +171,20 @@ function Withdraw() {
       <div className={styles.Deposit}>
         <div className={styles.TitleContainer}>
           <h2 className={styles.Title}>{(parseFloat(amountLPInput) / 10 ** 18).toFixed(6)}</h2>
-        </div>
-
-        <div>
-          <div className={styles.LabelContainer}>
-            <div className={styles.Label}>
-              <div>$</div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <InfoIcon />
-                Available:
-                {' '}
-                {(tokenBalance0 || tokenBalance1) && (decimals0 || decimals1)
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <InfoIcon />
+            Available:
+            {' '}
+            {(tokenBalance0 || tokenBalance1) && (decimals0 || decimals1)
                 && (
                   <span>
                     {(parseFloat(amountLPInput) / 10 ** 18).toFixed(6)}
                   </span>
                 )}
-              </div>
-            </div>
           </div>
+        </div>
 
+        <div>
           <input
             type="range"
             min="0"
