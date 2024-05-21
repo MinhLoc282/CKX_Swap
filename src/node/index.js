@@ -4,11 +4,8 @@ import { HttpAgent } from '@dfinity/agent';
 import { createRequire } from 'node:module';
 import { MongoClient, ServerApiVersion } from 'mongodb';
 import { Principal } from '@dfinity/principal';
-import express from 'express';
 import { canisterId, createActor } from '../declarations/borrow/index.js';
 import { identity } from './identity.js';
-
-const app = express();
 
 const uri = 'mongodb+srv://minhloc2802:Saikikusuo333@cluster0.budz48r.mongodb.net/';
 
@@ -188,8 +185,3 @@ const getNonRepaidBorrowers = async () => {
   });
   return borrowerList;
 };
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
