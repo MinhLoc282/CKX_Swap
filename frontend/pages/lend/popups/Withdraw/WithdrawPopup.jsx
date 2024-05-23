@@ -12,7 +12,8 @@ import { useAuth } from '../../../../hooks/use-auth-client';
 
 // import * as deposit from '../../../../../src/declarations/deposit';
 // import * as token0 from '../../../../../src/declarations/token0';
-import * as deposit from '../../../../../src/declarations/deposit';
+import * as deposit0 from '../../../../../src/declarations/deposit0';
+import * as deposit1 from '../../../../../src/declarations/deposit1';
 
 import dckETH from '../../../../assets/d.cketh.png';
 import ckETH from '../../../../assets/ckETH.png';
@@ -76,7 +77,6 @@ function WithdrawPopup({
     }
   };
 
-  console.log(selectedRows);
   const closeModal = () => {
     closeWithdrawModal();
     setDepositInfo([]);
@@ -228,7 +228,7 @@ function WithdrawPopup({
           amount: Number(inputBalance) * 10 ** decimals,
           expected_allowance: [],
           expires_at: [],
-          spender: Principal.fromText(deposit.canisterId),
+          spender: Principal.fromText(btcOrEth === 'ckETH' ? deposit1.canisterId : deposit0.canisterId),
         };
         console.log(Number(inputBalance) * 10 ** decimals);
         const tx0 = await depositActor.icrc2_approve(record);
@@ -237,6 +237,7 @@ function WithdrawPopup({
         const tx = await depositActor.unWrapToken(
           Number(inputBalance) * 10 ** decimals,
         );
+        console.log(tx);
         if ('Ok' in tx) {
           toast.success('Convert successfull');
           closeModal();

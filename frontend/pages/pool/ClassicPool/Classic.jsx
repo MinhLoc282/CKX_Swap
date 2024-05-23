@@ -10,7 +10,7 @@ import MyPosition from './MyPosition/MyPosition';
 import Deposit from './Deposit/Deposit';
 import Withdraw from './Withdraw/Withdraw';
 import AddLiquidityPage from './addLiquidity/AddLiquidityPage';
-import Faucet from './Faucet/Faucet';
+// import Faucet from '../../faucet/Faucet';
 
 function Classic() {
   const [menu, setMenu] = useState('Overview');
@@ -45,10 +45,10 @@ function Classic() {
             <WithdrawIcon />
             <div>Withdraw</div>
           </div>
-          <div className={`${styles.buttonMenu} ${menu === 'Faucet' && styles.selectedButton}`} onClick={() => setMenu('Faucet')}>
+          {/* <div className={`${styles.buttonMenu} ${menu === 'Faucet' && styles.selectedButton}`} onClick={() => setMenu('Faucet')}>
             <DepositIcon />
             <div>Faucet</div>
-          </div>
+          </div> */}
         </div>
         <div className={styles.RightContent}>
           {menu === 'Overview' && <Overview />}
@@ -56,7 +56,7 @@ function Classic() {
           {/* {menu === 'Deposit' && <Deposit />} */}
           {menu === 'Withdraw' && <Withdraw />}
           {menu === 'Liquidity' && <AddLiquidityPage />}
-          {menu === 'Faucet' && <Faucet />}
+          {/* {menu === 'Faucet' && <Faucet />} */}
         </div>
       </div>
     </div>

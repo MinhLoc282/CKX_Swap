@@ -25,6 +25,10 @@ function NavigationContainer() {
           Lend
         </Link>
 
+        <Link to="/faucet" className={location.pathname === '/faucet' ? styles.Active : ''}>
+          Faucet
+        </Link>
+
         {/* <Link to="/porfolio" className={location.pathname === '/porfolio' ? styles.Active : ''}>
           Porfolio
         </Link> */}

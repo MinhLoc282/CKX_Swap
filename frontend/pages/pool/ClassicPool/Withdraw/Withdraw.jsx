@@ -175,12 +175,12 @@ function Withdraw() {
             <InfoIcon />
             Available:
             {' '}
-            {(tokenBalance0 || tokenBalance1) && (decimals0 || decimals1)
-                && (
-                  <span>
-                    {(parseFloat(amountLPInput) / 10 ** 18).toFixed(6)}
-                  </span>
-                )}
+            {lpTokenBalance
+              ? (
+                <span>
+                  {(parseFloat(lpTokenBalance) / 10 ** 18).toFixed(6)}
+                </span>
+              ) : 0}
           </div>
         </div>
 

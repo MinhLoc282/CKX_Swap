@@ -114,8 +114,6 @@ function BorrowPopup({
           tokenCanister = token1.canisterId;
         }
 
-        console.log(amountInput);
-
         const tx = await borrowActor.borrow(
           amountInput - 10000, // prevent bigInt
           Principal.fromText(tokenCanister),

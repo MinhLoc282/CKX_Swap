@@ -49,6 +49,11 @@ export const idlFactory = ({ IDL }) => {
     'checkRemoveLP_2' : IDL.Func([IDL.Principal], [IDL.Vec(IDL.Float64)], []),
     'deposit' : IDL.Func([IDL.Nat], [IDL.Text], []),
     'getAvaiableToBorrow' : IDL.Func([IDL.Nat], [IDL.Vec(IDL.Nat)], []),
+    'getCurrentTotalBorrowed' : IDL.Func(
+        [],
+        [IDL.Record({ 'token0' : IDL.Nat, 'token1' : IDL.Nat })],
+        [],
+      ),
     'getDepositId' : IDL.Func([], [IDL.Opt(DepositType)], []),
     'getDepositIdPerUser' : IDL.Func(
         [IDL.Principal],

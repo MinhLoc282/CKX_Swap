@@ -10,6 +10,10 @@ export interface Borrow {
   'checkRemoveLP_2' : ActorMethod<[Principal], Array<number>>,
   'deposit' : ActorMethod<[bigint], string>,
   'getAvaiableToBorrow' : ActorMethod<[bigint], Array<bigint>>,
+  'getCurrentTotalBorrowed' : ActorMethod<
+    [],
+    { 'token0' : bigint, 'token1' : bigint }
+  >,
   'getDepositId' : ActorMethod<[], [] | [DepositType]>,
   'getDepositIdPerUser' : ActorMethod<[Principal], [] | [DepositType]>,
   'getHealthRaito' : ActorMethod<[Principal], number>,

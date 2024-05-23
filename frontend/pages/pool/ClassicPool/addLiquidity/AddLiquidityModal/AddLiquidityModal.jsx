@@ -289,6 +289,8 @@ function AddLiquidityModal({
       await token0Actor.icrc2_approve(record);
       await token1Actor.icrc2_approve(record1);
 
+      console.log(formValues);
+
       if (formValues.token0 === pair[0].token0) {
         const timestamp = Math.floor(new Date().getTime() * 10000000000);
 

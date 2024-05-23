@@ -11,7 +11,8 @@ const uri = 'mongodb+srv://minhloc2802:Saikikusuo333@cluster0.budz48r.mongodb.ne
 
 // Require syntax is needed for JSON file imports
 const require = createRequire(import.meta.url);
-const isDev = process.env.DFX_NETWORK !== 'ic';
+// const isDev = process.env.DFX_NETWORK !== 'ic';
+const isDev = false;
 let localCanisterIds;
 if (isDev) {
   localCanisterIds = require('../../.dfx/local/canister_ids.json');
@@ -125,7 +126,7 @@ async function main() {
     } catch (error) {
       console.error('Error in sendInterestToLendingCanister:', error);
     }
-  }, 60000); // 3600000
+  }, 120000); // 3600000
 }
 
 main();
@@ -142,17 +143,26 @@ run().catch(console.dir);
 const db = client.db('ICP');
 const collection = db.collection('CKX');
 
-const insertUser = (userId, borrower, tokenIdBorrow, isRepaid) => {
+const insertUser = async (userId, borrower, tokenIdBorrow, isRepaid) => {
   const document = {
-    id: userId, borrower, tokenIdBorrow, isRepaid,
+    id: userId,
+    borrower,
+    tokenIdBorrow,
+    isRepaid,
   };
-  collection.insertOne(document, (err, result) => {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log(`Insert ${document.borrower}`);
-    }
-  });
+
+  // Check if a record with the same id already exists
+  const existingRecord = await collection.findOne({ id: userId });
+
+  if (existingRecord) {
+    // If a record with the same id exists, update it
+    await collection.updateOne({ id: userId }, { $set: document });
+    console.log(`Updated record with id ${userId}`);
+  } else {
+    // If no record with the same id exists, insert a new one
+    await collection.insertOne(document);
+    console.log(`Inserted record with id ${userId}`);
+  }
 };
 
 async function updateLoanStatus(loanId, isRepaidVa) {

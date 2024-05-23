@@ -54,6 +54,10 @@ type Borrow =
    checkRemoveLP_2: (principal) -> (vec float64);
    deposit: (nat) -> (text);
    getAvaiableToBorrow: (nat) -> (vec nat);
+   getCurrentTotalBorrowed: () -> (record {
+                                     token0: nat;
+                                     token1: nat;
+                                   });
    getDepositId: () -> (opt DepositType);
    getDepositIdPerUser: (principal) -> (opt DepositType);
    getHealthRaito: (principal) -> (float64);

@@ -1223,12 +1223,8 @@ shared (msg) actor class Deposit(
           owner = Principal.fromActor(this);
           subaccount = ?defaultSubaccount
         });
-        Debug.print(debug_show(bal));
-        Debug.print(debug_show(transferValue));
         if (bal < transferValue) {
             var sendTx = await borrowCanister.sendTokenToLendingCanister(Principal.fromText(canister_token_ID), transferValue - bal);
-            Debug.print("sendTx");
-            Debug.print(debug_show(sendTx));
             switch (sendTx) {
               case (#Ok(txIndex)) {};
               case (#Err(transferError)) {
@@ -1269,7 +1265,6 @@ shared (msg) actor class Deposit(
             fee = null;
             created_at_time = null
         };
-        Debug.print(debug_show(tx));
 
         return tx
         // return #Ok(1);

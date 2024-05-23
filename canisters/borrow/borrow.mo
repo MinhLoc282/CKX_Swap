@@ -43,6 +43,13 @@ shared (msg) actor class Borrow(
     private var swap_id : Text = _swap_id;
 
     private var loanId = 0;
+    private var currentTotalBorrowed : {
+        var token0 : Nat;
+        var token1 : Nat
+    } = {
+        var token0 = 0;
+        var token1 = 0
+    };
 
     public type TxReceipt = Result.Result<Nat, Text>;
     type DepositType = {
@@ -186,17 +193,17 @@ shared (msg) actor class Borrow(
                         } else {
                             var newDepInform : DepositType = {
                                 amount = r.amount + lpValue;
-                                interest = 0;
-                                startTime = 0;
-                                duration = 0;
+                                interest = r.interest;
+                                startTime = r.startTime;
+                                duration = r.duration;
                                 isActive = true;
                                 tokenIdBorrow = r.tokenIdBorrow;
                                 borrow = r.borrow;
-                                isUsing = false;
+                                isUsing = r.isUsing;
                                 isAllowWithdraw = true;
-                                reserve0 = 0;
-                                reserve1 = 0;
-                                loadId = 0;
+                                reserve0 = r.reserve0;
+                                reserve1 = r.reserve1;
+                                loadId = r.loadId;
                             };
                             depositInfoLpToken.put(msg.caller, newDepInform);
                             return "Update deposit"
@@ -234,17 +241,17 @@ shared (msg) actor class Borrow(
         durationIndex: Nat,
     ) : async Text {
         let durations : [Nat] = [
-            86400000000, // 1 day
-            259200000000, // 3 days
-            604800000000, // 7 days
-            1209600000000, // 14 days
-            2592000000000, // 1 month
-            7776000000000, // 3 months
-            15552000000000, // 6 months
-            23328000000000, // 9 months
-            31104000000000, // 12 months
-            38880000000000, // 15 months
-            46656000000000, // 18 months
+            86400000000000, // 1 day
+            259200000000000, // 3 days
+            604800000000000, // 7 days
+            1209600000000000, // 14 days
+            2592000000000000, // 1 month
+            7776000000000000, // 3 months
+            15552000000000000, // 6 months
+            23328000000000000, // 9 months
+            31104000000000000, // 12 months
+            38880000000000000, // 15 months
+            46656000000000000, // 18 months
         ];
 
         let maybeArray = depositInfoLpToken.get(msg.caller);
@@ -387,6 +394,16 @@ shared (msg) actor class Borrow(
                                     loadId = 0;
                                 };
                                 depositInfoLpToken.put(msg.caller, newDepInform);
+
+                                var principalTokens = await getPairInfoPrincipal(lpValue);
+                                var principalToken0 = principalTokens[0];
+                                var principalToken1 = principalTokens[1];
+
+                                if (Principal.toText(r.tokenIdBorrow) == principalToken0) {
+                                    currentTotalBorrowed.token0 -= borrowValue;
+                                } else if (Principal.toText(r.tokenIdBorrow) == principalToken1) {
+                                    currentTotalBorrowed.token1 -= borrowValue;
+                                };
 
                                 // Update the corresponding LoanDetail record
                                 let updatedLoanDetail: LoanDetail = {
@@ -698,8 +715,11 @@ shared (msg) actor class Borrow(
                 let maybeArray = depositInfoLpToken.get(user);
 
                 var amountTokens = await getPairInfo(lpValue);
+                var principalTokens = await getPairInfoPrincipal(lpValue);
                 var amountToken0 = amountTokens[0];
                 var amountToken1 = amountTokens[1];
+                var principalToken0 = principalTokens[0];
+                var principalToken1 = principalTokens[1];
 
                 addNewLoanDetail(loanId, caller, tokenId);
 
@@ -725,6 +745,12 @@ shared (msg) actor class Borrow(
                             loadId = loanId;
                         };
                         depositInfoLpToken.put(user, newDepInform);
+
+                        if (Principal.toText(tokenId) == principalToken0) {
+                            currentTotalBorrowed.token0 += borrowValue;
+                        } else if (Principal.toText(tokenId) == principalToken1) {
+                            currentTotalBorrowed.token1 += borrowValue;
+                        };
                         return "Success"
                     };
                     case (_) {
@@ -748,6 +774,13 @@ shared (msg) actor class Borrow(
                 }
             }
         }
+    };
+
+    public func getCurrentTotalBorrowed() : async { token0 : Nat; token1 : Nat } {
+        return {
+            token0 = currentTotalBorrowed.token0;
+            token1 = currentTotalBorrowed.token1;
+        };
     };
 
     public func getPairInfo(lpAmount : Nat) : async [Nat] {
@@ -910,8 +943,10 @@ shared (msg) actor class Borrow(
                     } else {
 
                         var at_borrow_rate : Float = Float.fromInt(r.reserve0) / Float.fromInt(r.reserve1);
+                        let now = Time.now();
+                        let at_time_end = r.startTime + r.duration;
 
-                        if (Float.abs(rate - at_borrow_rate) > remove_rate) {
+                        if (Float.abs(rate - at_borrow_rate) > remove_rate or now >= at_time_end) {
                             // remove lp
                             var aggregtor_canister = actor (Principal.toText(aggregator_id)) : actor {
                                 removeLP(
@@ -935,6 +970,9 @@ shared (msg) actor class Borrow(
                                 created_at_time = null;
                                 expected_allowance = null
                             };
+                            var principalTokens = await getPairInfoPrincipal(r.amount);
+                            var principalToken0 = principalTokens[0];
+                            var principalToken1 = principalTokens[1];
                             var approve = await aggregtor_canister.icrc2_approve(apprArg);
                             var remove_call = await aggregtor_canister.removeLP(
                                 token0,
@@ -976,7 +1014,7 @@ shared (msg) actor class Borrow(
                                     var value0 = (r.amount * reserve0 / totalSupply);
                                     var value1 = (r.amount * reserve1 / totalSupply);
                                     var interest = (r.borrow * fee / 100);
-                                    var valueShouldPaid = r.borrow + (r.borrow * fee / 100);
+                                    var valueShouldPaid = r.borrow + interest;
                                     Debug.print("End preCheck:");
                                     var add_call : Text = "";
                                     if (r.tokenIdBorrow == token0) {
@@ -1136,6 +1174,12 @@ shared (msg) actor class Borrow(
                                                       loadId = 0;
                                                   };
                                                   depositInfoLpToken.put(principal, newDepInform);
+
+                                                  if (Principal.toText(r.tokenIdBorrow) == principalToken0) {
+                                                      currentTotalBorrowed.token0 -= r.borrow;
+                                                  } else if (Principal.toText(r.tokenIdBorrow) == principalToken1) {
+                                                      currentTotalBorrowed.token1 -= r.borrow;
+                                                  };
                                                   rtArr := Array.append(rtArr, [1]);
                                               };
                                               case null {
